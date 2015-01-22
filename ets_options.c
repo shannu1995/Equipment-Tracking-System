@@ -13,80 +13,53 @@
 /* an example of a menu function you will need to fully define */
 BOOLEAN display_equipment(struct ets * ets)
 {
-	/* The UNUSED() function is designed to prevent warnings while
-	 * your code is only partially complete. Delete this function
-	 * call once you are using your own code */
 	UNUSED(ets);
 	return FALSE;
 }
 BOOLEAN loan_equipment(struct ets * ets)
 {
-	/* The UNUSED() function is designed to prevent warnings while
-	 * your code is only partially complete. Delete this function
-	 * call once you are using your own code */
 	UNUSED(ets);
 	return FALSE;
 }
 
 BOOLEAN return_equipment(struct ets * ets)
 {
-	/* The UNUSED() function is designed to prevent warnings while
-	 * your code is only partially complete. Delete this function
-	 * call once you are using your own code */
 	UNUSED(ets);
 	return FALSE;
 }
 
 BOOLEAN query_equipment_id(struct ets * ets)
 {
-	/* The UNUSED() function is designed to prevent warnings while
-	 * your code is only partially complete. Delete this function
-	 * call once you are using your own code */
 	UNUSED(ets);
 	return FALSE;
 }
 
 BOOLEAN query_member_id(struct ets * ets)
 {
-	/* The UNUSED() function is designed to prevent warnings while
-	 * your code is only partially complete. Delete this function
-	 * call once you are using your own code */
 	UNUSED(ets);
 	return FALSE;
 }
 
 BOOLEAN display_loan_list(struct ets * ets)
 {
-	/* The UNUSED() function is designed to prevent warnings while
-	 * your code is only partially complete. Delete this function
-	 * call once you are using your own code */
 	UNUSED(ets);
 	return FALSE;
 }
 
 BOOLEAN save(struct ets * ets)
 {
-	/* The UNUSED() function is designed to prevent warnings while
-	 * your code is only partially complete. Delete this function
-	 * call once you are using your own code */
 	UNUSED(ets);
 	return FALSE;
 }
 
 BOOLEAN add_equipment(struct ets * ets)
 {
-	/* The UNUSED() function is designed to prevent warnings while
-	 * your code is only partially complete. Delete this function
-	 * call once you are using your own code */
 	UNUSED(ets);
 	return FALSE;
 }
 
 BOOLEAN change_equipment_amount(struct ets * ets)
 {
-	/* The UNUSED() function is designed to prevent warnings while
-	 * your code is only partially complete. Delete this function
-	 * call once you are using your own code */
 	UNUSED(ets);
 	return FALSE;
 }

@@ -24,7 +24,7 @@ typedef enum truefalse
 /* This is the ets structure you will pass to many functions */
 struct ets 
 {
-	int dummy;	/* delete this and replace with your own variables */
+	int dummy;
 };
 
 #endif

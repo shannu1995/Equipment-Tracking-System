@@ -15,15 +15,20 @@
 
 #ifndef ETS_UTILITY
 #define ETS_UTILITY
+#define BUFFER_SIZE 1024
 #define NUM_MENU_OPTS 12
+#define NUM_FIELDS 3
+#define DELIMETER "|"
 
+enum string_result
+{
+	STRING_TOOLONG, STRING_EMPTY, STRING_SUCCESS
+};
+
+enum int_result
+{
+	INT_STRINGTOOBIG, INT_STRINGEMPTY, INT_NOTINT, INT_OUTOFRANGE, INT_SUCCESS
+};
 void read_rest_of_line(void);
-BOOLEAN ets_init(struct ets * ets);
-BOOLEAN load_data(struct ets * ets,
-	const char * equip_fname,
-	const char * member_fname,
-	const char * loan_fname);
-void ets_free(struct ets * ets); 
-
 #endif
 

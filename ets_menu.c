@@ -42,4 +42,5 @@ void menu_print(struct menu_item  menu[])
 	{
 		printf("%d. %s\n", i + 1, menu[i].name);
 	}
+	printf("\n");
 }

@@ -18,9 +18,6 @@ int main(int argc, char * argv[])
 {
 	struct ets ets;
 	struct menu_item menu_items[NUM_MENU_ITEMS];
-	/* The UNUSED() function is designed to prevent warnings while your 
-	 * code is only partially complete. Delete these 4 function calls once 
-	 * you are using the data structures declared above in your own code */
 	if(argc != NUMARGS)
 	{
 		fprintf(stderr,"Fatal Error: Must have %d number of command line arguments\n",NUMARGS);

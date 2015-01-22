@@ -19,37 +19,35 @@ void read_rest_of_line(void)
         clearerr(stdin);
 }
 
-/* initialises the ets data structure to safe initial values. */
-BOOLEAN ets_init(struct ets * ets)
+enum string_result get_string(char *s, unsigned size, FILE *stream)
 {
-        /* The UNUSED() function is designed to prevent warnings while
-         * your code is only partially complete. Delete this function
-         * call once you are using your own code */
-        UNUSED(ets);
-        return FALSE;
+	unsigned len;
+	if(fgets(s, size, stream) == NULL)
+	{
+		return STRING_EMPTY;
+	}    
+	len = strlen(s);
+	if(len == 1)
+	{
+		return STRING_EMPTY;
+	}
+	
+	else if(s[len-1] == '\n')
+	{
+		s[len-1] = '\0';
+		return STRING_SUCCESS;
+	}
+	
+	else
+	{
+		read_rest_of_line();
+		return STRING_TOOLONG;
+	}
 }
 
-/* loads data from the .dat files into memory. */
-BOOLEAN load_data(struct ets * ets,
-        const char * equip_fname,
-        const char * member_fname,
-        const char * loan_fname)
-{
-        /* The UNUSED() function is designed to prevent warnings while
-         * your code is only partially complete. Delete this function
-         * call once you are using your own code */
-        UNUSED(ets);
-        UNUSED(equip_fname);
-        UNUSED(member_fname);
-        UNUSED(loan_fname);      
-        return FALSE;
-}
 
 /* frees all dynamically allocated data. */
 void ets_free(struct ets * ets)
 {
-        /* The UNUSED() function is designed to prevent warnings while
-         * your code is only partially complete. Delete this function
-         * call once you are using your own code */
-        UNUSED(ets);
+	UNUSED(ets);
 }

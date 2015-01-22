@@ -32,6 +32,4 @@ BOOLEAN change_equipment_amount(struct ets *);
 BOOLEAN add_member(struct ets *);
 BOOLEAN delete_member(struct ets *);
 BOOLEAN abort_program(struct ets *);
-/* you will need to define many more! */
-
 #endif
