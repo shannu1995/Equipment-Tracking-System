@@ -9,14 +9,13 @@
  * Based on 2014 code by Paul Miller and Virginia King
  **********************************************************************/
 #include "ets_utility.h"
-
 /* clears the input buffer. */
 void read_rest_of_line(void)
 {
-        int ch;
-        while(ch = getc(stdin), ch!='\n' && ch != EOF) 
-                ;
-        clearerr(stdin);
+	int ch;
+	while(ch = getc(stdin), ch!='\n' && ch != EOF) 
+	         ;
+	clearerr(stdin);
 }
 
 enum string_result get_string(char *s, unsigned size, FILE *stream)
@@ -45,4 +44,22 @@ enum string_result get_string(char *s, unsigned size, FILE *stream)
 	}
 }
 
+BOOLEAN str_to_unsigned(char *s, unsigned *u)
+{
+	if(!is_unsigned(s))
+		return FALSE;
+	*u = (unsigned)strtol(s,NULL,10);
+	return TRUE;
+}
 
+BOOLEAN is_unsigned(char *s)
+{
+	int i;
+	char *end_ptr;
+	i = (int)strtol(s, &end_ptr, 10);
+	if(i < 0 || strcmp(end_ptr,"") != 0)
+	{
+		return FALSE;
+	}
+	return TRUE;
+}

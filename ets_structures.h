@@ -16,12 +16,7 @@
 #define NUMARGS 4
 #define IDLEN 5
 #define NAMELEN 31
-
-/* type definition for our boolean type */
-typedef enum truefalse
-{
-	FALSE, TRUE
-} BOOLEAN;
+#define EQUIP_FIELDS 3
 
 /* This is the ets structure you will pass to many functions */
 
@@ -81,6 +76,7 @@ struct equipment_info
 {
 	char equipID[IDLEN + 1];
 	char equipName[NAMELEN + 1];
+	unsigned quantity;
 };
 
 struct equipment_node
@@ -94,16 +90,25 @@ struct equipment_list
 	struct equipment_node *head;
 	unsigned length;
 };
+
+enum equip_fields
+{
+	ID, NAME, QUANTITY
+};
 /****************************  END  *******************************/
 
 struct ets 
 {
 	struct loan_list *loans;
+	struct equipment_list *equipment;
+	struct member_list *members;
 	char *loan_file;
 	char *equip_file;
 	char *member_file;
 };
 BOOLEAN ets_init(struct ets * ets);
 BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * member_fname, const char * loan_fname);
+BOOLEAN add_item_node(struct equipment_list *list, struct equipment_info *item);
 void ets_free(struct ets * ets);
+void create_equipment(struct equipment_info *item, char *id, char *name, unsigned quantity);
 #endif

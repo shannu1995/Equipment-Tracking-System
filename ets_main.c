@@ -23,9 +23,10 @@ int main(int argc, char * argv[])
 		fprintf(stderr,"Fatal Error: Must have %d number of command line arguments\n",NUMARGS);
 		return EXIT_FAILURE;
 	}
-	UNUSED(argv);
-	UNUSED(ets);
+	ets_init(&ets);
+	load_data(&ets, argv[1], argv[2], argv[3]);
 	menu_init(menu_items);    
 	menu_print(menu_items);
+	display_equipment(&ets);
 	return EXIT_SUCCESS;
 }
