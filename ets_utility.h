@@ -8,7 +8,7 @@
  * Start up code provided by David Shaw
  * Based on 2014 code by Paul Miller and Virginia King
  **********************************************************************/
-#include "ets_type.h"
+#include "ets_structures.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

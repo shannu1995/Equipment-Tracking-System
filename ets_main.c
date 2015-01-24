@@ -10,7 +10,7 @@
  **********************************************************************/
 
 #include "ets_menu.h"
-#include "ets_type.h"
+#include "ets_structures.h"
 #include <stdlib.h>
 
 

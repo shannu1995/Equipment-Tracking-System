@@ -21,4 +21,9 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 	UNUSED(loan_fname);      
 	return FALSE;
 }
+/* frees all dynamically allocated data. */
+void ets_free(struct ets * ets)
+{
+	UNUSED(ets);
+}
 

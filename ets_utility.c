@@ -46,8 +46,3 @@ enum string_result get_string(char *s, unsigned size, FILE *stream)
 }
 
 
-/* frees all dynamically allocated data. */
-void ets_free(struct ets * ets)
-{
-	UNUSED(ets);
-}
