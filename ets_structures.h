@@ -43,6 +43,11 @@ struct loan_list
 	struct loan_node *head;
 	unsigned length;
 };
+
+enum loan_fields
+{
+	MEMBER_ID, ITEM_ID, NUMBER_LENT
+};
 /****************************  END   ******************************/
 
 
@@ -71,7 +76,7 @@ struct member_list
 
 enum member_fields
 {
-	MEM_ID, LAST_NAME, FIRST_NAME, LENT
+	MEM_ID, LAST_NAME, FIRST_NAME
 };
 /****************************  END  *******************************/
 
@@ -117,7 +122,9 @@ BOOLEAN ets_init(struct ets * ets);
 BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * member_fname, const char * loan_fname);
 BOOLEAN add_item_node(struct equipment_list *list, struct equipment_info *item);
 BOOLEAN add_member_node(struct member_list *list, struct member_info *person);
+BOOLEAN add_loan_node(struct loan_list *list, struct loan_info *loan);
 void ets_free(struct ets * ets);
 void create_equipment(struct equipment_info *item, char *id, char *name, unsigned quantity);
 void create_member(struct member_info *person, char *id, char *first_name, char *last_name, unsigned lent);
+void create_loan(struct loan_info *loan, char *member_id, char *item_id, unsigned amount);
 #endif

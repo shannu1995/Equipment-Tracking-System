@@ -23,11 +23,11 @@ BOOLEAN display_equipment(struct ets * ets)
 		return TRUE;
 	}
 	curr = ets->equipment->head;
-	printf("IdNo\tName\t\tQuantity\n");
+	printf("IdNo\tName\tAvailable\n");
 	while(curr != NULL)
 	{
 		data = curr->data;
-		printf("%s\t%s\t\t%u\n",data->equipID,data->equipName,data->quantity);
+		printf("%s\t%s\t%u\n",data->equipID,data->equipName,data->quantity);
 		curr = curr->next;
 	}
 	return TRUE;
