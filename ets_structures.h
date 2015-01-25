@@ -17,6 +17,7 @@
 #define IDLEN 5
 #define NAMELEN 31
 #define EQUIP_FIELDS 3
+#define MEMBER_FIELDS 4
 
 /* This is the ets structure you will pass to many functions */
 
@@ -51,8 +52,9 @@ struct loan_list
 struct member_info
 {
 	char memberID[IDLEN + 1];
-	char lastName[NAMELEN + 1];
 	char firstName[NAMELEN + 1];
+	char lastName[NAMELEN + 1];
+	unsigned borrowed;
 };
 
 struct member_node
@@ -65,6 +67,11 @@ struct member_list
 {
 	struct member_node *head;
 	unsigned length;
+};
+
+enum member_fields
+{
+	MEM_ID, LAST_NAME, FIRST_NAME, LENT
 };
 /****************************  END  *******************************/
 
@@ -109,6 +116,8 @@ struct ets
 BOOLEAN ets_init(struct ets * ets);
 BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * member_fname, const char * loan_fname);
 BOOLEAN add_item_node(struct equipment_list *list, struct equipment_info *item);
+BOOLEAN add_member_node(struct member_list *list, struct member_info *person);
 void ets_free(struct ets * ets);
 void create_equipment(struct equipment_info *item, char *id, char *name, unsigned quantity);
+void create_member(struct member_info *person, char *id, char *first_name, char *last_name, unsigned lent);
 #endif

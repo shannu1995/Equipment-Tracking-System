@@ -40,16 +40,18 @@ BOOLEAN ets_init(struct ets * ets)
 BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * member_fname, const char * loan_fname)
 {
 	struct equipment_info *item;
+	struct member_info *person;
 	FILE *equip_file, *member_file, *loan_file;
 	char *token;
 	char *tokens[NUM_FIELDS];
+	char *member_tokens[MEMBER_FIELDS];
 	char line[BUFFER_SIZE];
+	enum member_fields member_field_type;
 	enum string_result result;
 	enum equip_fields field_type;
 	unsigned quantity;
-	UNUSED(member_file);
+	unsigned lent;
 	UNUSED(loan_file);
-	UNUSED(member_fname);
 	UNUSED(loan_fname);      
 	equip_file = fopen(equip_fname, "r");
 	if(!equip_file)
@@ -76,7 +78,33 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 		add_item_node(ets->equipment, item);
 	}
 	fclose(equip_file);
-	return FALSE;
+	member_file = fopen(member_fname, "r");
+	if(!member_file)
+	{
+		fprintf(stderr, "Cannot open member file\n");
+		return FALSE;
+	}
+	while((result = get_string(line, BUFFER_SIZE, member_file)) != STRING_EMPTY)
+	{
+		if(result == STRING_TOOLONG)
+			return FALSE;
+		member_field_type = MEM_ID;
+		token = strtok(line, DELIMETER);
+		
+		while(token != NULL)
+		{
+			member_tokens[member_field_type] = token;
+			member_field_type++;
+			token = strtok(NULL, DELIMETER);
+		}
+		lent = 0;
+		person = malloc(sizeof *person);
+		memset(person, 0, sizeof *person);
+		create_member(person, member_tokens[MEM_ID], member_tokens[FIRST_NAME], member_tokens[LAST_NAME], lent);
+		add_member_node(ets->members, person);
+	}
+	fclose(member_file);
+	return TRUE;
 }
 /* frees all dynamically allocated data. */
 void ets_free(struct ets * ets)
@@ -89,7 +117,13 @@ void create_equipment(struct equipment_info *item, char *id, char *name, unsigne
 	strcpy(item->equipName, name);
 	item->quantity = quantity;
 }
-
+void create_member(struct member_info *person, char *id, char *first_name, char *last_name, unsigned lent)
+{
+	strcpy(person->memberID,id);
+	strcpy(person->lastName,last_name);
+	strcpy(person->firstName,first_name);
+	person->borrowed = lent;
+}
 BOOLEAN add_item_node(struct equipment_list *list, struct equipment_info *item)
 {
 	struct equipment_node *new_node, *prev, *curr;
@@ -120,3 +154,36 @@ BOOLEAN add_item_node(struct equipment_list *list, struct equipment_info *item)
 	list->length++;
 	return TRUE;
 }
+
+
+BOOLEAN add_member_node(struct member_list *list, struct member_info *person)
+{
+	struct member_node *new_node, *prev, *curr;
+	if(list == NULL || person == NULL)
+		return FALSE;
+	prev = NULL;
+	curr = list->head;
+	new_node = malloc(sizeof(new_node));
+	if(!new_node)
+	{
+		return FALSE;
+	}
+	new_node->data = person;
+	while(curr != NULL && strcmp(person->lastName, curr->data->lastName))
+	{
+		prev = curr;
+		curr = curr->next;
+	}
+	new_node->next = curr;
+	if(prev == NULL)
+	{
+		list->head = new_node;
+	}
+	else
+	{
+		prev->next = new_node;
+	}
+	list->length++;
+	return TRUE;
+}
+

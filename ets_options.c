@@ -46,7 +46,8 @@ BOOLEAN return_equipment(struct ets * ets)
 
 BOOLEAN query_equipment_id(struct ets * ets)
 {
-	UNUSED(ets);
+	enum string_result result;
+	UNUSED(result);
 	return FALSE;
 }
 
