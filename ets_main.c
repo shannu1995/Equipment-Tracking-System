@@ -28,5 +28,6 @@ int main(int argc, char * argv[])
 	menu_init(menu_items);    
 	menu_print(menu_items);
 	display_equipment(&ets);
+	display_member_list(&ets);
 	return EXIT_SUCCESS;
 }

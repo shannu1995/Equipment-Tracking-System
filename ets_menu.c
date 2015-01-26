@@ -16,14 +16,14 @@ void menu_init(struct menu_item  menu[])
 	int i;
 	char *options[] =
 	{"Loan Equipment", "Return Equipment", "Query Equipment ID", "Query Member ID",
-	"Display Equipment List", "Display Loan List", "Save and Exit", "Add New Equipment", "Change Equipment Amount",
+	"Display Equipment List", "Display Loan List","Display Member List", "Save and Exit", "Add New Equipment", "Change Equipment Amount",
 	"Add Member", "Delete Member",
 	"Abort"};
 	
 	BOOLEAN (*options_funcs[])(struct ets*) =
 	{
 		loan_equipment, return_equipment, query_equipment_id, query_member_id, display_equipment, display_loan_list,
-		save, add_equipment, change_equipment_amount, add_member, delete_member, abort_program
+		display_member_list, save, add_equipment, change_equipment_amount, add_member, delete_member, abort_program
 	};
 	
 	for(i = 0; i < NUM_MENU_ITEMS; i++)

@@ -13,25 +13,71 @@
 /* an example of a menu function you will need to fully define */
 BOOLEAN display_equipment(struct ets * ets)
 {
-	struct equipment_node *curr;
-	struct equipment_info *data;
+	struct ets_node *curr_item;
+	struct ets_item *item_data;
+	struct ets_node *curr_loan;
+	struct ets_item *loan_data;
 	if(!ets)
 		return FALSE;
-	if(ets->equipment->length == 0)
+	if(ets->items_list->length == 0)
 	{
-		printf("The equipment list is empty\n");
+		printf("The list is empty\n");
 		return TRUE;
 	}
-	curr = ets->equipment->head;
-	printf("IdNo\tName\tAvailable\n");
-	while(curr != NULL)
+	curr_item = ets->items_list->head;
+	while(curr_item != NULL)
 	{
-		data = curr->data;
-		printf("%s\t%s\t%u\n",data->equipID,data->equipName,data->quantity);
-		curr = curr->next;
+		item_data = curr_item->data;
+		curr_loan = ets->loans_list->head;
+		while(curr_loan != NULL)
+		{
+			loan_data = curr_loan->data;
+			if(strcmp(item_data->itemId,loan_data->borroweeId) == 0)
+			{
+				item_data->total = item_data->available + loan_data->items_borrowed;
+			}
+			curr_loan = curr_loan->next;
+		}
+		if(item_data->total == 0)
+			item_data->total = item_data->available;
+		printf("%s\t%s\t%u\t%u\n",item_data->itemId, item_data->itemName, item_data->available, item_data->total);
+		curr_item = curr_item->next;
 	}
 	return TRUE;
 }
+
+BOOLEAN display_member_list(struct ets * ets)
+{
+	struct ets_node *curr_member;
+	struct ets_item *member_data;
+	struct ets_node *curr_loan;
+	struct ets_item *loan_data;
+	printf("\n");
+	if(!ets)
+		return FALSE;
+	if(ets->members_list->length == 0)
+	{
+		printf("The list is empty\n");
+		return TRUE;
+	}
+	curr_member = ets->members_list->head;
+	while(curr_member != NULL)
+	{
+		member_data = curr_member->data;
+		curr_loan = ets->loans_list->head;
+		while(curr_loan != NULL)
+		{
+			loan_data = curr_loan->data;
+			if(strcmp(member_data->memberId, loan_data->borrowerId) == 0)
+				member_data->items_borrowed = loan_data->items_borrowed;
+			curr_loan = curr_loan->next;
+		}
+		curr_member = curr_member->next;
+		printf("%s\t%s\t%s\t%u\n",member_data->memberId, member_data->firstName, member_data->lastName, member_data->items_borrowed);
+	}
+	return TRUE;
+}
+
 BOOLEAN loan_equipment(struct ets * ets)
 {
 	UNUSED(ets);
@@ -59,8 +105,7 @@ BOOLEAN query_member_id(struct ets * ets)
 
 BOOLEAN display_loan_list(struct ets * ets)
 {
-	UNUSED(ets);
-	return FALSE;
+	return TRUE;
 }
 
 BOOLEAN save(struct ets * ets)

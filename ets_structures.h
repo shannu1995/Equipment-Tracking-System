@@ -21,110 +21,59 @@
 
 /* This is the ets structure you will pass to many functions */
 
-
-/*
- * ***********************   LOAN LINKED LIST   ***********************
- * */
-struct loan_info
-{
-	char memberID[IDLEN + 1];
-	char equipID[IDLEN + 1];
-	unsigned number;
-};
-
-struct loan_node
-{
-	struct loan_info *data;
-	struct loan_node *next;
-};
-
-struct loan_list
-{
-	struct loan_node *head;
-	unsigned length;
-};
-
-enum loan_fields
-{
-	MEMBER_ID, ITEM_ID, NUMBER_LENT
-};
-/****************************  END   ******************************/
-
-
-/*
- ***********************  MEMBER LINKED LISTS***********************
- **/
-struct member_info
-{
-	char memberID[IDLEN + 1];
-	char firstName[NAMELEN + 1];
-	char lastName[NAMELEN + 1];
-	unsigned borrowed;
-};
-
-struct member_node
-{
-	struct member_info *data;
-	struct member_node *next;
-};
-
-struct member_list
-{
-	struct member_node *head;
-	unsigned length;
-};
-
-enum member_fields
-{
-	MEM_ID, LAST_NAME, FIRST_NAME
-};
-/****************************  END  *******************************/
-
-
-/*
- ***********************  EQUIPMENT LINKED LISTS***********************
- **/
-struct equipment_info
-{
-	char equipID[IDLEN + 1];
-	char equipName[NAMELEN + 1];
-	unsigned quantity;
-};
-
-struct equipment_node
-{
-	struct equipment_info *data;
-	struct equipment_node *next;
-};
-
-struct equipment_list
-{
-	struct equipment_node *head;
-	unsigned length;
-};
-
-enum equip_fields
-{
-	ID, NAME, QUANTITY
-};
-/****************************  END  *******************************/
-
 struct ets 
 {
-	struct loan_list *loans;
-	struct equipment_list *equipment;
-	struct member_list *members;
+	struct ets_list *items_list;
+	struct ets_list *loans_list;
+	struct ets_list *members_list;
 	char *loan_file;
 	char *equip_file;
 	char *member_file;
 };
+
+struct ets_list
+{
+	struct ets_node *head;
+	unsigned length;
+};
+
+struct ets_node
+{
+	struct ets_item *data;
+	struct ets_node *next;
+};
+
+struct ets_item
+{
+	char itemId[IDLEN + 1];
+	char itemName[NAMELEN + 1];
+	unsigned available;
+	char memberId[IDLEN + 1];
+	char firstName[NAMELEN + 1];
+	char lastName[NAMELEN + 1];
+	char borrowerId[IDLEN + 1];
+	char borroweeId[IDLEN + 1];
+	unsigned items_borrowed;
+	unsigned total;
+};
+
+enum ets_fields
+{
+	ITEM_ID, ITEM_NAME, ITEM_AVAILABILITY
+};
+enum loan_fields
+{
+	BORROWER_ID, BORROWEE_ID, ITEMS_BORROWED
+};
+enum member_fields
+{
+	MEMBER_ID, FIRST_NAME, LAST_NAME
+};
 BOOLEAN ets_init(struct ets * ets);
 BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * member_fname, const char * loan_fname);
-BOOLEAN add_item_node(struct equipment_list *list, struct equipment_info *item);
-BOOLEAN add_member_node(struct member_list *list, struct member_info *person);
-BOOLEAN add_loan_node(struct loan_list *list, struct loan_info *loan);
-void ets_free(struct ets * ets);
-void create_equipment(struct equipment_info *item, char *id, char *name, unsigned quantity);
-void create_member(struct member_info *person, char *id, char *first_name, char *last_name, unsigned lent);
-void create_loan(struct loan_info *loan, char *member_id, char *item_id, unsigned amount);
+BOOLEAN add_node(struct ets_list *list, struct ets_item *item);
+BOOLEAN add_member_node(struct ets_list *list, struct ets_item *member);
+void create_loans(struct ets_item *item, char *borrowerId, char *borroweeId, unsigned quantity);
+void create_item(struct ets_item *item, char *itemId, char *name, unsigned quantity);
+void create_member(struct ets_item *member, char *memberId, char *lastName, char *firstName);
 #endif

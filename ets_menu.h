@@ -15,7 +15,7 @@
 #define ETS_MENU
 
 /* set this to the number of menu items */
-#define NUM_MENU_ITEMS 12
+#define NUM_MENU_ITEMS 13
 #define ITEM_NAME_LEN 63
 
 /* The data structure to hold information about each menu option, the 
