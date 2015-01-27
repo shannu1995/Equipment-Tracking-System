@@ -44,6 +44,40 @@ enum string_result get_string(char *s, unsigned size, FILE *stream)
 	}
 }
 
+enum int_result get_int(int *n, unsigned size, int min, int max, FILE *stream)
+{
+	char temp_str[BUFFER_SIZE];
+	int temp_int = 0;
+	char *end_ptr;
+	enum string_result input_res;
+	input_res = get_string(temp_str, size, stream);
+	if(input_res == STRING_TOOLONG)
+	{
+		return INT_STRINGTOOBIG;
+	}
+	else if(input_res == STRING_EMPTY)
+	{
+		return INT_STRINGEMPTY;
+	}
+	else /* String successfully read */
+	{
+		temp_int = (int)strtol(temp_str, &end_ptr, 10);
+		if(strcmp(end_ptr, "") != 0)
+		{
+			return INT_NOTINT;
+		}
+		else if(temp_int < min || temp_int > max)
+		{
+			return INT_OUTOFRANGE;
+		}
+		else
+		{
+			*n = temp_int;
+			return INT_SUCCESS;
+		}
+	}
+}
+
 BOOLEAN str_to_unsigned(char *s, unsigned *u)
 {
 	if(!is_unsigned(s))

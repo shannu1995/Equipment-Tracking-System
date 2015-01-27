@@ -17,7 +17,9 @@
 int main(int argc, char * argv[])
 {
 	struct ets ets;
+	int selection;
 	struct menu_item menu_items[NUM_MENU_ITEMS];
+	BOOLEAN exit = FALSE;
 	if(argc != NUMARGS)
 	{
 		fprintf(stderr,"Fatal Error: Must have %d number of command line arguments\n",NUMARGS);
@@ -25,9 +27,18 @@ int main(int argc, char * argv[])
 	}
 	ets_init(&ets);
 	load_data(&ets, argv[1], argv[2], argv[3]);
+	combine_members_loans(&ets);
+	combine_items_loans(&ets);
 	menu_init(menu_items);    
-	menu_print(menu_items);
-	display_equipment(&ets);
-	display_member_list(&ets);
+	do
+	{
+		menu_print(menu_items);
+		selection = get_valid_selection(menu_items);
+		if(selection == 13 || selection == 8)
+			exit = TRUE;
+		menu_items[selection - 1].func(&ets);
+	}
+	while(exit == FALSE);
+	ets_free(&ets);
 	return EXIT_SUCCESS;
 }

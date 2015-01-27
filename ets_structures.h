@@ -76,4 +76,12 @@ BOOLEAN add_member_node(struct ets_list *list, struct ets_item *member);
 void create_loans(struct ets_item *item, char *borrowerId, char *borroweeId, unsigned quantity);
 void create_item(struct ets_item *item, char *itemId, char *name, unsigned quantity);
 void create_member(struct ets_item *member, char *memberId, char *lastName, char *firstName);
+void free_node(struct ets_node *node);
+void ets_free(struct ets * ets);
+BOOLEAN combine_items_loans(struct ets * ets);
+BOOLEAN combine_members_loans(struct ets * ets);
+BOOLEAN combine_items_members(struct ets * ets);
+BOOLEAN delete_item_node(struct ets_list *list, char *item_id, struct ets_item *removed_item);
+BOOLEAN delete_member_node(struct ets_list *list, char *memberId, struct ets_item *removed_member);
+BOOLEAN find_item(struct ets *ets, char *needle);
 #endif

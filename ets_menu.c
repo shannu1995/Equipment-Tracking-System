@@ -44,3 +44,26 @@ void menu_print(struct menu_item  menu[])
 	}
 	printf("\n");
 }
+
+int get_valid_selection(struct menu_item menu[])
+{
+	int selection;
+	enum int_result selection_result;
+	BOOLEAN valid_option_selected = FALSE;    
+	while(!valid_option_selected)
+	{
+		printf("\nEnter selection: ");
+		selection_result = get_int(&selection, BUFFER_SIZE, 1, NUM_MENU_OPTS, stdin);
+		/* Test if input was a valid selection */
+		if(selection_result == INT_SUCCESS)
+		{
+			valid_option_selected = TRUE;
+		}
+		else
+		{
+			printf("\nInvalid input\n\n");
+			menu_print(menu);
+		}
+	}
+	return selection;
+}

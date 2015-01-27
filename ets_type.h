@@ -21,10 +21,5 @@ typedef enum truefalse
 	FALSE, TRUE
 } BOOLEAN;
 
-/* This is the ets structure you will pass to many functions */
-struct ets 
-{
-	int dummy;	/* delete this and replace with your own variables */
-};
-
+enum int_result get_int(int *n, unsigned size, int min, int max, FILE *stream);
 #endif

@@ -10,7 +10,7 @@
  **********************************************************************/
 #include "ets_structures.h"
 #include "ets_options.h"
-
+#include "ets_utility.h"
 #ifndef ETS_MENU
 #define ETS_MENU
 
@@ -30,4 +30,5 @@ struct menu_item
 /* builds the menu for the prototype */
 void menu_init(struct menu_item[] );
 void menu_print(struct menu_item[] );
+int get_valid_selection(struct menu_item menu[]);
 #endif
