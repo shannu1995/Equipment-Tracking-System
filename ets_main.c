@@ -23,6 +23,7 @@ int main(int argc, char * argv[])
 	if(argc != NUMARGS)
 	{
 		fprintf(stderr,"Fatal Error: Must have %d number of command line arguments\n",NUMARGS);
+		printf("Enter in the format ./ets <equip_file> <member_file> <loan_file>\n");
 		return EXIT_FAILURE;
 	}
 	ets_init(&ets);

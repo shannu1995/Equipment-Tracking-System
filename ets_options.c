@@ -15,6 +15,11 @@ BOOLEAN display_equipment(struct ets * ets)
 {
 	struct ets_node *curr_item;
 	struct ets_item *item_data;
+	int i;
+	printf("EQUIPMENT TRACKING SYSTEM\n");
+	for(i = 1; i <= 25; i++)
+		printf("-");
+	printf("\n");
 	if(!ets)
 		return FALSE;
 	if(ets->items_list->length == 0)
@@ -144,6 +149,7 @@ BOOLEAN display_loan_list(struct ets * ets)
 	{
 		member_data = member_node->data;
 		curr_loan = ets->loans_list->head;
+		if(member_data->items_borrowed != 0)
 		printf("%s\t%s %s\t\t\t%u\n",member_data->memberId,member_data->firstName,member_data->lastName,member_data->items_borrowed);
 		while(curr_loan != NULL)
 		{
@@ -249,7 +255,7 @@ BOOLEAN change_equipment_amount(struct ets * ets)
 			while(!is_valid_quantity)
 			{
 				unsigned_result = get_int(&quantity,BUFFER_SIZE, 0, 99, stdin);
-				if(unsigned_result == INT_SUCCESS && quantity >= 0)
+				if(unsigned_result == INT_SUCCESS && quantity >= 0 && quantity >= item_data->available - item_data->total)
 				{
 					if(quantity == 0)
 					{
@@ -258,7 +264,14 @@ BOOLEAN change_equipment_amount(struct ets * ets)
 					is_valid_quantity = TRUE;
 				}
 				else
+				{
+					if(quantity < item_data->available - item_data->total)
+					{
+						printf("Cannot reduce the item to %u as %u number of items were borrowed\n",
+						quantity,item_data->available - item_data->total);
+					}
 					printf("Invalid quantity, try again\n");
+				}
 			}
 			item_data->available = (unsigned)quantity;
 		}

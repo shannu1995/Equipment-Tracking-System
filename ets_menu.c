@@ -37,10 +37,10 @@ void menu_init(struct menu_item  menu[])
 void menu_print(struct menu_item  menu[])
 {
 	int i;
-	printf("\n");
+	printf("Main Menu\n");
 	for(i = 0; i < NUM_MENU_ITEMS; i++)
 	{
-		printf("%d. %s\n", i + 1, menu[i].name);
+		printf("\t%d. %s\n", i + 1, menu[i].name);
 	}
 	printf("\n");
 }
@@ -52,7 +52,7 @@ int get_valid_selection(struct menu_item menu[])
 	BOOLEAN valid_option_selected = FALSE;    
 	while(!valid_option_selected)
 	{
-		printf("\nEnter selection: ");
+		printf("\nSelect Option(1 - 13): ");
 		selection_result = get_int(&selection, BUFFER_SIZE, 1, NUM_MENU_OPTS, stdin);
 		/* Test if input was a valid selection */
 		if(selection_result == INT_SUCCESS)
