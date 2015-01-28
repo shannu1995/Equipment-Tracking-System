@@ -313,6 +313,7 @@ BOOLEAN combine_members_loans(struct ets * ets)
 			{
 				strcpy(loan_data->firstName, member_data->firstName);
 				strcpy(loan_data->lastName, member_data->lastName);
+				strcpy(member_data->itemId, loan_data->borroweeId);
 				member_data->items_borrowed = loan_data->items_borrowed;
 			}
 			curr_loan = curr_loan->next;

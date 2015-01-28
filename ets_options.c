@@ -112,7 +112,7 @@ BOOLEAN loan_equipment(struct ets * ets)
 			printf("Try Again\n");
 		}
 	}while(is_valid_id == FALSE);
-	curr_node = ets->items_list->head;	
+	curr_node = ets->items_list->head;
 	while(curr_node != NULL)
 	{
 		item_data = curr_node->data;
@@ -133,19 +133,25 @@ BOOLEAN loan_equipment(struct ets * ets)
 			member_data->items_borrowed += (unsigned)quantity;
 			item_data->total -= (unsigned)quantity;
 		}
+		else
+		{
+			if((unsigned)quantity > item_data->total)
+			{
+				printf("Cannot loan more than available\n");
+				printf("Please enter the quantity\n");
+				res = get_int(&quantity, BUFFER_SIZE, 1, 9999,stdin);
+			}
+		}
 	}
 	loan_data = malloc(sizeof *loan_data);
 	memset(loan_data, 0, sizeof *loan_data);
 	create_loans(loan_data, member_data->memberId, item_data->itemId, quantity);
 	add_node(ets->loans_list, loan_data);
-	combine_members_loans(ets);
-	combine_items_loans(ets);
 	return TRUE;
 }
 
 BOOLEAN return_equipment(struct ets * ets)
 {
-	UNUSED(ets);
 	return FALSE;
 }
 

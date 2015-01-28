@@ -38,6 +38,8 @@ int main(int argc, char * argv[])
 		if(selection == 13 || selection == 8)
 			exit = TRUE;
 		menu_items[selection - 1].func(&ets);
+	combine_members_loans(&ets);
+	combine_items_loans(&ets);
 	}
 	while(exit == FALSE);
 	ets_free(&ets);
