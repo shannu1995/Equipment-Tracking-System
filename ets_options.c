@@ -61,7 +61,86 @@ BOOLEAN display_member_list(struct ets * ets)
 
 BOOLEAN loan_equipment(struct ets * ets)
 {
-	return FALSE;
+	struct ets_item *member_data;
+	struct ets_node *curr_node;
+	struct ets_item *item_data;
+	struct ets_item *loan_data;
+	char id[IDLEN + 2];
+	enum string_result result;
+	enum int_result res;
+	BOOLEAN is_valid_id = FALSE;
+	BOOLEAN is_valid_quantity = FALSE;
+	int quantity;
+	printf("Please enter memberId\n");
+	do
+	{
+		result = get_string(id,IDLEN + 2,stdin);
+		if(result == STRING_SUCCESS && find_member(ets, id) == TRUE)
+		{
+			is_valid_id = TRUE;
+		}
+		else
+		{
+			if(find_member(ets, id) == FALSE)
+				printf("No member with id as %s has not been found\n",id);
+			printf("Try Again\n");
+		}
+	}while(is_valid_id == FALSE);
+	curr_node = ets->members_list->head;
+	while(curr_node != NULL)
+	{
+		member_data = curr_node->data;
+		if(strcmp(member_data->memberId, id) == 0)
+		{
+			printf("%s %s %s x %u\n",member_data->memberId, member_data->lastName, member_data->firstName, member_data->items_borrowed);
+			break;
+		}
+		curr_node = curr_node->next;
+	}
+	printf("Please enter itemId\n");
+	do
+	{
+		result = get_string(id,IDLEN + 2,stdin);
+		if(result == STRING_SUCCESS && find_item(ets, id) == TRUE)
+		{
+			is_valid_id = TRUE;
+		}
+		else
+		{
+			if(find_item(ets, id) == FALSE)
+				printf("No item with id as %s has not been found\n",id);
+			printf("Try Again\n");
+		}
+	}while(is_valid_id == FALSE);
+	curr_node = ets->items_list->head;	
+	while(curr_node != NULL)
+	{
+		item_data = curr_node->data;
+		if(strcmp(item_data->itemId, id) == 0)
+		{
+			printf("%s %s x %u\n",item_data->itemId, item_data->itemName, item_data->total);
+			printf("Please enter the quantity\n");
+			res = get_int(&quantity, BUFFER_SIZE, 1, 9999,stdin);
+			break;
+		}
+		curr_node = curr_node->next;
+	}
+	while(is_valid_quantity == FALSE)
+	{
+		if((unsigned)quantity <= item_data->total && res == INT_SUCCESS)
+		{
+			is_valid_quantity = TRUE;
+			member_data->items_borrowed += (unsigned)quantity;
+			item_data->total -= (unsigned)quantity;
+		}
+	}
+	loan_data = malloc(sizeof *loan_data);
+	memset(loan_data, 0, sizeof *loan_data);
+	create_loans(loan_data, member_data->memberId, item_data->itemId, quantity);
+	add_node(ets->loans_list, loan_data);
+	combine_members_loans(ets);
+	combine_items_loans(ets);
+	return TRUE;
 }
 
 BOOLEAN return_equipment(struct ets * ets)
@@ -294,10 +373,17 @@ BOOLEAN add_member(struct ets * ets)
 	while(!is_valid_id)
 	{
 		result = get_string(id,IDLEN + 2,stdin);
-		if(result == STRING_SUCCESS)
+		if(result == STRING_SUCCESS && find_member(ets,id) == FALSE)
 			is_valid_id = TRUE;
 		else
-			printf("Invalid item id, try again\n");
+		{
+			if(find_member(ets, id) == TRUE)
+				printf("A member with id %s already exists, try again\n",id);
+			else
+			{
+				printf("Invalid id, try again\n");
+			}
+		}
 	}
 	printf("Please enter the member's first name\n");
 	while(!is_valid_first_name)
@@ -330,6 +416,8 @@ BOOLEAN delete_member(struct ets * ets)
 	enum string_result result;
 	struct ets_item *member;
 	BOOLEAN is_valid_id = FALSE;
+	char prompt;
+	BOOLEAN prompt_entered = FALSE;
 	member = ets->members_list->head->data;
 	printf("Please enter the member ID\n");
 	while(!is_valid_id)
@@ -341,12 +429,38 @@ BOOLEAN delete_member(struct ets * ets)
 			printf("Invalid member id, try again\n");
 		
 	}
-	delete_member_node(ets->members_list, id, member);
+	while(!prompt_entered)
+	{
+		printf("Are you sure you want to delete this member?  (Y/n)");
+		prompt = getc(stdin);
+		if(prompt == 'Y' || prompt == 'n' || prompt == 'N')
+			prompt_entered = TRUE;
+	}
+	if(prompt == 'Y')
+	{
+		if(delete_member_node(ets->members_list, id, member) == TRUE)
+		{
+			printf("Member \"%s %s\" removed\n",member->firstName, member->lastName);
+		}
+		else
+		{
+			printf("Quitting\n");
+		}
+	}
+	read_rest_of_line();
 	return FALSE;
 }
 
 BOOLEAN abort_program(struct ets * ets)
 {
-	UNUSED(ets);
+	char prompt;
+	printf("Do you wish to abort ets (all data will be lost)? (Y/n)");
+	prompt = getc(stdin);
+	while(prompt != 'Y' && prompt != 'n')
+	{
+		printf("\nInvalid character entered, try again\n");
+		printf("Do you wish to abort ets (all data will be lost)? (Y/n)");
+		prompt = getc(stdin);
+	}
 	return FALSE;
 }

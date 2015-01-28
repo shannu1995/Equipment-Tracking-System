@@ -66,8 +66,9 @@ enum int_result get_int(int *n, unsigned size, int min, int max, FILE *stream)
 		{
 			return INT_NOTINT;
 		}
-		else if(temp_int < min || temp_int > max)
+		else if(temp_int < min || temp_int > max + 1)
 		{
+			printf("Integer out of range\n");
 			return INT_OUTOFRANGE;
 		}
 		else

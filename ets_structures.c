@@ -313,7 +313,7 @@ BOOLEAN combine_members_loans(struct ets * ets)
 			{
 				strcpy(loan_data->firstName, member_data->firstName);
 				strcpy(loan_data->lastName, member_data->lastName);
-				member_data->items_borrowed += loan_data->items_borrowed;
+				member_data->items_borrowed = loan_data->items_borrowed;
 			}
 			curr_loan = curr_loan->next;
 		}
@@ -331,6 +331,21 @@ BOOLEAN find_item(struct ets * ets, char *needle)
 	{
 		curr_data = curr_node->data;
 		if(strcmp(curr_data->itemId, needle) == 0)
+			return TRUE;
+		curr_node = curr_node->next;
+	}
+	return FALSE;
+}
+
+BOOLEAN find_member(struct ets * ets, char *needle)
+{
+	struct ets_node  *curr_node;
+	struct ets_item  *curr_data;
+	curr_node = ets->members_list->head;
+	while(curr_node != NULL)
+	{
+		curr_data = curr_node->data;
+		if(strcmp(curr_data->memberId, needle) == 0)
 			return TRUE;
 		curr_node = curr_node->next;
 	}
@@ -393,7 +408,11 @@ BOOLEAN delete_member_node(struct ets_list *list, char *member_id, struct ets_it
 		prev = curr;
 		curr = curr->next;
 	}
-	    
+	if(curr->data->items_borrowed != 0)
+	{
+		printf("Cannot delete member if loans are due\n");
+		return FALSE;
+	}	
 	/* Check if item was found */
 	if (curr == NULL)
 	{
