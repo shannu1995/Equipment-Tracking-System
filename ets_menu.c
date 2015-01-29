@@ -50,6 +50,7 @@ int get_valid_selection(struct menu_item menu[])
 	int selection;
 	enum int_result selection_result;
 	BOOLEAN valid_option_selected = FALSE;    
+	printf("\n\n");
 	while(!valid_option_selected)
 	{
 		printf("\nSelect Option(1 - 13): ");
@@ -61,7 +62,7 @@ int get_valid_selection(struct menu_item menu[])
 		}
 		else
 		{
-			printf("\nInvalid input\n\n");
+			printf("Invalid input\n\n");
 			menu_print(menu);
 		}
 	}

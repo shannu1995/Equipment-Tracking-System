@@ -33,13 +33,13 @@ int main(int argc, char * argv[])
 	menu_init(menu_items);    
 	do
 	{
+		printf("\n\n");
 		menu_print(menu_items);
 		selection = get_valid_selection(menu_items);
 		if(selection == 13 || selection == 8)
 			exit = TRUE;
 		menu_items[selection - 1].func(&ets);
-	combine_members_loans(&ets);
-	combine_items_loans(&ets);
+		combine_items_loans(&ets);
 	}
 	while(exit == FALSE);
 	ets_free(&ets);

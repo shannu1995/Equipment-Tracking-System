@@ -85,4 +85,5 @@ BOOLEAN delete_item_node(struct ets_list *list, char *item_id, struct ets_item *
 BOOLEAN delete_member_node(struct ets_list *list, char *memberId, struct ets_item *removed_member);
 BOOLEAN find_item(struct ets *ets, char *needle);
 BOOLEAN find_member(struct ets *ets, char *needle);
+BOOLEAN find_loan(struct ets * ets, char *itemId, char *memberId);
 #endif

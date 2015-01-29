@@ -13,14 +13,35 @@
 # put your Makefile targets in here
 ###################################
 
-########################################################################
-# Move this target to the end of the Makefile to zip up your code 
-# when submitting. Please add any additional files you add to your 
-# project and delete ones your remove. Do not submit your .dat files, 
-# your .bin files, containing directories. We only want the files that 
-# are part of your implementation
-########################################################################
+CC=gcc
+CFLAGS= -ansi -Wall -pedantic
+CDEBUG = -g
+SOURCES = ets_main.c ets_menu.c ets_structures.c ets_utility.c ets_options.c
+OBJS = $(SOURCES:.c=.o) 
+HEADERS = *.h
+USER = s3453738
+ARCHIVE_FILES = *.c *.h Makefile
+EXE = ets
 
+all:		$(EXE)
+
+$(EXE):	$(OBJS)
+		  $(CC) $(CFAGS) $(OBJS) -o $@
+
+%.o:	%.c
+		  $(CC) $(CFLAGS) $< -c -o $@  
+
+
+debug:	$(SOURCES)
+		  $(CC) $(CFLAGS) $(CDEBUG) $(SOURCES) -o $(EXE)
+
+.PHONY: clean archive 
+
+clean:
+		  rm -rf *.o *.out $(EXE) 
+
+archive:
+		  zip $(USER) $(ARCHIVE_FILES) 
 archive:
 	zip $(USER) ets_main.c ets_options.c ets_options.h ets_type.h \
 	ets_menu.c ets_menu.h ets_utility.h ets_utility.c Makefile readme.txt

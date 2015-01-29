@@ -64,11 +64,12 @@ enum int_result get_int(int *n, unsigned size, int min, int max, FILE *stream)
 		temp_int = (int)strtol(temp_str, &end_ptr, 10);
 		if(strcmp(end_ptr, "") != 0)
 		{
+			printf("Please enter an integer\n");
 			return INT_NOTINT;
 		}
 		else if(temp_int < min || temp_int > max + 1)
 		{
-			printf("Integer out of range\n");
+			printf("Please enter an integer between %d and %d\n",min, max + 1);
 			return INT_OUTOFRANGE;
 		}
 		else

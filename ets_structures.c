@@ -178,6 +178,8 @@ void ets_free(struct ets * ets)
 	}
 	
 	free(ets->items_list);
+	free(ets->members_list);
+	free(ets->loans_list);
 	ets->items_list = NULL;    
 	free(ets->loan_file);
 	free(ets->equip_file);
@@ -236,7 +238,7 @@ BOOLEAN add_member_node(struct ets_list *list, struct ets_item *member)
 		return FALSE;
 	memset(new_node, 0, sizeof *new_node);
 	new_node->data = member;
-	while(curr != NULL && strcmp(member->lastName, curr->data->lastName) > 0)
+	while(curr != NULL && strcmp(member->firstName, curr->data->firstName) > 0)
 	{
 		prev = curr;
 		curr = curr->next;
@@ -247,7 +249,6 @@ BOOLEAN add_member_node(struct ets_list *list, struct ets_item *member)
 	else
 		prev->next = new_node;
 	list->length += 1;
-	printf("%s\t%s\t%s\n",new_node->data->memberId, new_node->data->lastName, new_node->data->firstName);
 	return TRUE;
 }
 
@@ -314,7 +315,7 @@ BOOLEAN combine_members_loans(struct ets * ets)
 				strcpy(loan_data->firstName, member_data->firstName);
 				strcpy(loan_data->lastName, member_data->lastName);
 				strcpy(member_data->itemId, loan_data->borroweeId);
-				member_data->items_borrowed = loan_data->items_borrowed;
+				member_data->items_borrowed += loan_data->items_borrowed;
 			}
 			curr_loan = curr_loan->next;
 		}
@@ -332,7 +333,9 @@ BOOLEAN find_item(struct ets * ets, char *needle)
 	{
 		curr_data = curr_node->data;
 		if(strcmp(curr_data->itemId, needle) == 0)
+		{
 			return TRUE;
+		}
 		curr_node = curr_node->next;
 	}
 	return FALSE;
@@ -347,12 +350,29 @@ BOOLEAN find_member(struct ets * ets, char *needle)
 	{
 		curr_data = curr_node->data;
 		if(strcmp(curr_data->memberId, needle) == 0)
+		{
+			return TRUE;
+		}
+		curr_node = curr_node->next;
+	}
+	printf("No member with id as %s has been found\n",needle);
+	return FALSE;
+}
+BOOLEAN find_loan(struct ets * ets, char *item_needle, char *member_needle)
+{
+	struct ets_node *curr_node;
+	struct ets_item *curr_data;
+	curr_node = ets->loans_list->head;
+	while(curr_node != NULL)
+	{
+		curr_data = curr_node->data;
+		if(strcmp(curr_data->borroweeId, item_needle) == 0 && strcmp(curr_data->borrowerId, member_needle) == 0)
 			return TRUE;
 		curr_node = curr_node->next;
 	}
+	printf("No member with id as %s has outstanding loans of item with id %s\n",member_needle, item_needle);
 	return FALSE;
 }
-
 BOOLEAN delete_item_node(struct ets_list *list, char *item_id, struct ets_item *removed_item)
 {
 	struct ets_node *prev, *curr;
@@ -411,7 +431,7 @@ BOOLEAN delete_member_node(struct ets_list *list, char *member_id, struct ets_it
 	}
 	if(curr->data->items_borrowed != 0)
 	{
-		printf("Cannot delete member if loans are due\n");
+		printf("Cannot delete member because loans are due\n");
 		return FALSE;
 	}	
 	/* Check if item was found */

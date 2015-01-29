@@ -9,15 +9,19 @@
  * Based on 2014 code by Paul Miller and Virginia King
  **********************************************************************/
 #include "ets_options.h"
-
-/* an example of a menu function you will need to fully define */
 BOOLEAN display_equipment(struct ets * ets)
 {
 	struct ets_node *curr_item;
 	struct ets_item *item_data;
 	int i;
-	printf("EQUIPMENT TRACKING SYSTEM\n");
-	for(i = 1; i <= 25; i++)
+	char heading[BUFFER_SIZE] = "Equipment List";
+	char sub_heading[BUFFER_SIZE] = "ID      Name                             Total  Avail.";
+	printf("\n\n%s\n",heading);
+	for(i = 1; i <= strlen(heading); i++)
+		printf("-");
+	printf("\n");
+	printf("%s\n",sub_heading);
+	for(i = 1; i <= strlen(sub_heading); i++)
 		printf("-");
 	printf("\n");
 	if(!ets)
@@ -31,7 +35,9 @@ BOOLEAN display_equipment(struct ets * ets)
 	while(curr_item != NULL)
 	{
 		item_data = curr_item->data;
-		printf("%s\t%s\t%u\t%u\n",item_data->itemId, item_data->itemName, item_data->available, item_data->total);
+		printf("%s   %s",item_data->itemId, item_data->itemName);
+		printf("            %u",item_data->available);
+		printf("            %u\n",item_data->total);
 		curr_item = curr_item->next;
 	}
 	return TRUE;
@@ -54,7 +60,7 @@ BOOLEAN display_member_list(struct ets * ets)
 	{
 		member_data = curr_member->data;
 		curr_member = curr_member->next;
-		printf("%s\t%s\t%s\t%u\n",member_data->memberId, member_data->firstName, member_data->lastName, member_data->items_borrowed);
+		printf("%s\t%s\t%s\t%u\n",member_data->memberId, member_data->lastName, member_data->firstName, member_data->items_borrowed);
 	}
 	return TRUE;
 }
@@ -71,19 +77,20 @@ BOOLEAN loan_equipment(struct ets * ets)
 	BOOLEAN is_valid_id = FALSE;
 	BOOLEAN is_valid_quantity = FALSE;
 	int quantity;
-	printf("Please enter memberId\n");
+	printf("%s",MEMBER_PROMPT);
 	do
 	{
 		result = get_string(id,IDLEN + 2,stdin);
+		printf("\n");
 		if(result == STRING_SUCCESS && find_member(ets, id) == TRUE)
 		{
 			is_valid_id = TRUE;
 		}
 		else
 		{
-			if(find_member(ets, id) == FALSE)
-				printf("No member with id as %s has not been found\n",id);
-			printf("Try Again\n");
+			if(result == STRING_EMPTY)
+				return FALSE;
+			printf("Try Again (ctrl-d to exit to main menu)");
 		}
 	}while(is_valid_id == FALSE);
 	curr_node = ets->members_list->head;
@@ -97,19 +104,23 @@ BOOLEAN loan_equipment(struct ets * ets)
 		}
 		curr_node = curr_node->next;
 	}
-	printf("Please enter itemId\n");
+	printf("%s",ITEM_PROMPT);
+	is_valid_id = FALSE;
 	do
 	{
 		result = get_string(id,IDLEN + 2,stdin);
+		printf("\n");
 		if(result == STRING_SUCCESS && find_item(ets, id) == TRUE)
 		{
 			is_valid_id = TRUE;
 		}
 		else
 		{
+			if(result == STRING_EMPTY)
+				return FALSE;
 			if(find_item(ets, id) == FALSE)
 				printf("No item with id as %s has not been found\n",id);
-			printf("Try Again\n");
+			printf("Try Again (ctrl-d to exit to main menu)\n");
 		}
 	}while(is_valid_id == FALSE);
 	curr_node = ets->items_list->head;
@@ -119,8 +130,9 @@ BOOLEAN loan_equipment(struct ets * ets)
 		if(strcmp(item_data->itemId, id) == 0)
 		{
 			printf("%s %s x %u\n",item_data->itemId, item_data->itemName, item_data->total);
-			printf("Please enter the quantity\n");
+			printf("%s",QUANTITY_PROMPT);
 			res = get_int(&quantity, BUFFER_SIZE, 1, 9999,stdin);
+			printf("\n");
 			break;
 		}
 		curr_node = curr_node->next;
@@ -135,10 +147,14 @@ BOOLEAN loan_equipment(struct ets * ets)
 		}
 		else
 		{
+			if(res == INT_STRINGEMPTY)
+			{
+				return FALSE;
+			}
 			if((unsigned)quantity > item_data->total)
 			{
 				printf("Cannot loan more than available\n");
-				printf("Please enter the quantity\n");
+				printf("Try again (ctrl-d to exit)\n");
 				res = get_int(&quantity, BUFFER_SIZE, 1, 9999,stdin);
 			}
 		}
@@ -152,6 +168,26 @@ BOOLEAN loan_equipment(struct ets * ets)
 
 BOOLEAN return_equipment(struct ets * ets)
 {
+	char itemId[IDLEN + 2];
+	char memberId[IDLEN + 2];
+	enum string_result result1,result2;
+	BOOLEAN is_valid_loan = FALSE;
+	printf("Please enter the member ID: ");
+	result1 = get_string(memberId,IDLEN + 2,stdin);
+	printf("\nPlease enter the equipment ID: ");
+	result2 = get_string(itemId, IDLEN + 2, stdin);
+	while(is_valid_loan == FALSE)
+	{
+		if(find_loan(ets, itemId, memberId) == TRUE && result1 == STRING_SUCCESS && result2 == STRING_SUCCESS)
+		{
+			
+		}
+		else
+		{
+			if(result1 == STRING_EMPTY || result2 == STRING_EMPTY)
+				return FALSE;
+		}
+	}
 	return FALSE;
 }
 
@@ -163,10 +199,26 @@ BOOLEAN query_equipment_id(struct ets * ets)
 	struct ets_node *curr_loan;
 	struct ets_item *loan_data;
 	char line[BUFFER_SIZE];
-	UNUSED(result);
-	printf("Please enter item ID\n");
+	BOOLEAN is_valid_id = FALSE;
+	printf("%s",ITEM_PROMPT);
 	result = get_string(line,IDLEN + 2,stdin);
+	printf("\n");
 	item_node = ets->items_list->head;
+	while(is_valid_id == FALSE)
+	{
+		if(result == STRING_SUCCESS && find_item(ets, line) == TRUE)
+		{
+			is_valid_id = TRUE;
+			break;
+		}
+		else
+		{
+			if(result == STRING_EMPTY)
+				return FALSE;
+			printf("Invalid id entered, try again (ctrl-d to exit to main menu)\n");
+			result = get_string(line, IDLEN + 2, stdin);
+		}
+	}
 	while(item_node != NULL)
 	{
 		item_data = item_node->data;
@@ -179,7 +231,7 @@ BOOLEAN query_equipment_id(struct ets * ets)
 				loan_data = curr_loan->data;
 				if(strcmp(item_data->itemId, loan_data->borroweeId) == 0)
 				{
-					printf("\t  %s %s %s*%u\n",loan_data->borrowerId, loan_data->firstName, loan_data->lastName, loan_data->items_borrowed);
+					printf("\t  %s %s %s x %u\n",loan_data->borrowerId, loan_data->firstName, loan_data->lastName, loan_data->items_borrowed);
 				}
 				curr_loan = curr_loan->next;
 			}
@@ -197,23 +249,41 @@ BOOLEAN query_member_id(struct ets * ets)
 	struct ets_item *loan_data;
 	enum string_result result;
 	char line[BUFFER_SIZE];
-	printf("Please enter member ID\n");
+	BOOLEAN is_valid_id = FALSE;
+	printf("%s",MEMBER_PROMPT);
+	printf("\n");
 	result = get_string(line,IDLEN + 2,stdin);
-	UNUSED(result);
 	member_node = ets->members_list->head;
+	while(is_valid_id == FALSE)
+	{
+		if(result == STRING_SUCCESS && find_member(ets, line) == TRUE)
+		{
+			is_valid_id = TRUE;
+			break;
+		}
+		else
+		{
+			if(result == STRING_EMPTY)
+			{
+				return FALSE;
+			}
+		}
+		printf("Invalid member id, try again (ctrl-D to exit)\n");
+		result = get_string(line, IDLEN + 2, stdin);
+	}
 	while(member_node != NULL)
 	{
 		member_data = member_node->data;
 		if(strcmp(member_data->memberId, line) == 0)
 		{
 			curr_loan = ets->loans_list->head;
-			printf("%s\t%s %s\t\t\t%u\n",member_data->memberId,member_data->firstName,member_data->lastName,member_data->items_borrowed);
+			printf("%s\t%s %s\t\t\t%u\n",member_data->memberId,member_data->lastName,member_data->firstName,member_data->items_borrowed);
 			while(curr_loan != NULL)
 			{
 				loan_data = curr_loan->data;
 				if(strcmp(member_data->memberId, loan_data->borrowerId) == 0)
 				{
-					printf("\t  %s %s*%u\n",loan_data->borroweeId, loan_data->itemName, loan_data->items_borrowed);
+					printf("\t  %s %s x %u\n",loan_data->borroweeId, loan_data->itemName, loan_data->items_borrowed);
 				}
 				curr_loan = curr_loan->next;
 			}
@@ -235,13 +305,13 @@ BOOLEAN display_loan_list(struct ets * ets)
 		member_data = member_node->data;
 		curr_loan = ets->loans_list->head;
 		if(member_data->items_borrowed != 0)
-		printf("%s\t%s %s\t\t\t%u\n",member_data->memberId,member_data->firstName,member_data->lastName,member_data->items_borrowed);
+		printf("%s\t%s %s\t\t\t%u\n",member_data->memberId,member_data->lastName,member_data->firstName,member_data->items_borrowed);
 		while(curr_loan != NULL)
 		{
 			loan_data = curr_loan->data;
 			if(strcmp(member_data->memberId, loan_data->borrowerId) == 0)
 			{
-				printf("\t  %s %s*%u\n",loan_data->borroweeId, loan_data->itemName, loan_data->items_borrowed);
+				printf("\t  %s %s x %u\n",loan_data->borroweeId, loan_data->itemName, loan_data->items_borrowed);
 			}
 			curr_loan = curr_loan->next;
 		}
@@ -271,28 +341,44 @@ BOOLEAN add_equipment(struct ets * ets)
 	while(!is_valid_id)
 	{
 		result = get_string(id,IDLEN + 2,stdin);
-		if(result == STRING_SUCCESS)
+		if(result == STRING_SUCCESS && find_item(ets, id) == FALSE)
 			is_valid_id = TRUE;
 		else
-			printf("Invalid item id, try again\n");
+		{
+			if(result == STRING_EMPTY)
+				return FALSE;
+			if(find_item(ets,id) == TRUE)
+				printf("Item with id as %s already exists\n",id);
+			printf("Invalid item id, try again (ctrl-d to exit to main menu)\n");
+		}
 	}
-	printf("Please enter the equipment name\n");
+	printf("Please enter the equipment name: ");
 	while(!is_valid_name)
 	{
 		result = get_string(name, NAMELEN + 2, stdin);
+		printf("\n");
 		if(result == STRING_SUCCESS)
 			is_valid_name = TRUE;
 		else
-			printf("Invalid item name, try again\n");
+		{
+			if(result == STRING_EMPTY)
+				return FALSE;
+			printf("Invalid item name, try again (ctrl-d to exit to main menu)\n");
+		}
 	}
-	printf("Please enter the total quantity\n");
+	printf("Please enter the total quantity: ");
 	while(!is_valid_quantity)
 	{
 		unsigned_result = get_int(&quantity,BUFFER_SIZE, 1, 99, stdin);
+		printf("\n");
 		if(unsigned_result == INT_SUCCESS && quantity > 0)
 			is_valid_quantity = TRUE;
 		else
-			printf("Invalid quantity, try again\n");
+		{
+			if(unsigned_result == INT_STRINGEMPTY)
+				return FALSE;
+			printf("Invalid quantity, try again (ctrl-d to exit to main menu)\n");
+		}
 	}
 	item = malloc(sizeof *(item));
 	memset(item, 0, sizeof *item);
@@ -311,23 +397,26 @@ BOOLEAN change_equipment_amount(struct ets * ets)
 	struct ets_item *item_data;
 	BOOLEAN is_valid_id = FALSE;
 	BOOLEAN is_valid_quantity = FALSE;
-	printf("Please enter the equipment ID\n");
+	printf("%s",ITEM_PROMPT);
 	while(!is_valid_id)
 	{
 		result = get_string(id,IDLEN + 2,stdin);
-		if(result == STRING_SUCCESS)
+		printf("\n");
+		if(result == STRING_SUCCESS && find_item(ets,id) == TRUE)
 		{
-			if(find_item(ets,id) == FALSE)
-			{
-				printf("No item with %s as its ID\n",id);
-			}
-			else
-			{
-				is_valid_id = TRUE;
-			}
+			
+			is_valid_id = TRUE;
+			
 		}
 		else
-			printf("Invalid item id, try again\n");
+		{
+			if(result == STRING_EMPTY)
+			{
+				printf("Exiting...\n");
+				return FALSE;
+			}
+			printf("Invalid item id, try again (ctrl-d to exit to main menu)\n");
+		}
 	}
 	curr_node = ets->items_list->head;
 	while(curr_node != NULL)
@@ -336,10 +425,11 @@ BOOLEAN change_equipment_amount(struct ets * ets)
 		if(strcmp(item_data->itemId, id) == 0)
 		{
 			printf("%s\t%s x %u\n",item_data->itemId,item_data->itemName,item_data->available);
-			printf("Please enter revised quantity(Enter 0 to delete)\n");
+			printf("Please enter revised quantity(Enter 0 to delete): ");
 			while(!is_valid_quantity)
 			{
 				unsigned_result = get_int(&quantity,BUFFER_SIZE, 0, 99, stdin);
+				printf("\n");
 				if(unsigned_result == INT_SUCCESS && quantity >= 0 && quantity >= item_data->available - item_data->total)
 				{
 					if(quantity == 0)
@@ -355,7 +445,12 @@ BOOLEAN change_equipment_amount(struct ets * ets)
 						printf("Cannot reduce the item to %u as %u number of items were borrowed\n",
 						quantity,item_data->available - item_data->total);
 					}
-					printf("Invalid quantity, try again\n");
+					if(unsigned_result == INT_STRINGEMPTY)
+					{
+						printf("Exiting...\n");
+						return FALSE;
+					}
+					printf("Invalid quantity, try again (ctrl-d to exit to main menu)\n");
 				}
 			}
 			item_data->available = (unsigned)quantity;
@@ -385,29 +480,50 @@ BOOLEAN add_member(struct ets * ets)
 		{
 			if(find_member(ets, id) == TRUE)
 				printf("A member with id %s already exists, try again\n",id);
+			else if(result == STRING_EMPTY)
+			{
+				printf("Exiting...\n");
+				return FALSE;
+			}
 			else
 			{
-				printf("Invalid id, try again\n");
+				printf("Invalid id, try again (ctrl-d to exit to main menu)\n");
 			}
 		}
 	}
-	printf("Please enter the member's first name\n");
+	printf("Please enter first name: ");
 	while(!is_valid_first_name)
 	{
 		result = get_string(fname, NAMELEN + 2, stdin);
+		printf("\n");
 		if(result == STRING_SUCCESS)
 			is_valid_first_name = TRUE;
 		else
+		{
+			if(result == STRING_EMPTY)
+			{
+				printf("Exiting...\n");
+				return FALSE;
+			}
 			printf("Invalid first name, try again\n");
+		}
 	}
-	printf("Please enter the member's last name\n");
+	printf("Please enter last name: ");
 	while(!is_valid_last_name)
 	{
 		result = get_string(lname, NAMELEN + 2, stdin);
+		printf("\n");
 		if(result == STRING_SUCCESS)
 			is_valid_last_name = TRUE;
 		else
-			printf("Invalid last name, try again\n");
+		{
+			if(result == STRING_EMPTY)
+			{
+				printf("Exiting...\n");
+				return FALSE;
+			}
+			printf("Invalid last name, try again (ctrl-d to exit)\n");
+		}
 	}
 	member = malloc(sizeof *(member));
 	memset(member, 0, sizeof *member);
@@ -425,14 +541,22 @@ BOOLEAN delete_member(struct ets * ets)
 	char prompt;
 	BOOLEAN prompt_entered = FALSE;
 	member = ets->members_list->head->data;
-	printf("Please enter the member ID\n");
+	printf("%s",MEMBER_PROMPT);
 	while(!is_valid_id)
 	{
 		result = get_string(id,IDLEN + 2,stdin);
-		if(result == STRING_SUCCESS)
+		printf("\n");
+		if(result == STRING_SUCCESS && find_member(ets, id) == TRUE)
 			is_valid_id = TRUE;
 		else
+		{
+			if(result == STRING_EMPTY)
+			{
+				printf("Exiting...\n");
+				return FALSE;
+			}
 			printf("Invalid member id, try again\n");
+		}
 		
 	}
 	while(!prompt_entered)
@@ -450,10 +574,9 @@ BOOLEAN delete_member(struct ets * ets)
 		}
 		else
 		{
-			printf("Quitting\n");
+			printf("Returning to main menu\n");
 		}
 	}
-	read_rest_of_line();
 	return FALSE;
 }
 

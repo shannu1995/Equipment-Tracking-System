@@ -10,7 +10,9 @@
  **********************************************************************/
 #include "ets_structures.h"
 #include "ets_utility.h"
-
+#define MEMBER_PROMPT "Please enter the member ID: "
+#define ITEM_PROMPT "Please enter the equipment ID: "
+#define QUANTITY_PROMPT "Please enter the quantity: "
 #ifndef ETS_OPTIONS
 #define ETS_OPTIONS
 
