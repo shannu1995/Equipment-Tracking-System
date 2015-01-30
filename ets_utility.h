@@ -16,7 +16,7 @@
 #ifndef ETS_UTILITY
 #define ETS_UTILITY
 #define BUFFER_SIZE 1024
-#define NUM_MENU_OPTS 12
+#define NUM_MENU_OPTS 13
 #define NUM_FIELDS 3
 #define DELIMETER "|"
 typedef enum truefalse

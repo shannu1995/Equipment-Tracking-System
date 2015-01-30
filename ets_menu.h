@@ -17,6 +17,7 @@
 /* set this to the number of menu items */
 #define NUM_MENU_ITEMS 13
 #define ITEM_NAME_LEN 63
+#define MAIN_MENU_HEADING "EQUIPMENT TRACKING SYSTEM"
 
 /* The data structure to hold information about each menu option, the 
  * name of the function to display and a pointer to the function that 

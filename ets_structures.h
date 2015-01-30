@@ -78,6 +78,7 @@ void create_item(struct ets_item *item, char *itemId, char *name, unsigned quant
 void create_member(struct ets_item *member, char *memberId, char *lastName, char *firstName);
 void free_node(struct ets_node *node);
 void ets_free(struct ets * ets);
+void print_item(struct ets * ets, char *itemId);
 BOOLEAN combine_items_loans(struct ets * ets);
 BOOLEAN combine_members_loans(struct ets * ets);
 BOOLEAN combine_items_members(struct ets * ets);
@@ -86,4 +87,10 @@ BOOLEAN delete_member_node(struct ets_list *list, char *memberId, struct ets_ite
 BOOLEAN find_item(struct ets *ets, char *needle);
 BOOLEAN find_member(struct ets *ets, char *needle);
 BOOLEAN find_loan(struct ets * ets, char *itemId, char *memberId);
+BOOLEAN is_valid_item(char *field, enum ets_fields field_type);
+BOOLEAN is_valid_member(char *field, enum member_fields field_type);
+BOOLEAN is_valid_loan(char *field, enum loan_fields field_type);
+BOOLEAN save_item_data(struct ets * ets, FILE * itemFp);
+BOOLEAN save_member_data(struct ets * ets, FILE * memberFp);
+BOOLEAN save_loan_data(struct ets * ets, FILE * loanFp);
 #endif

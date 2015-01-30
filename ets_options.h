@@ -13,14 +13,17 @@
 #define MEMBER_PROMPT "Please enter the member ID: "
 #define ITEM_PROMPT "Please enter the equipment ID: "
 #define QUANTITY_PROMPT "Please enter the quantity: "
+#define MEMBER_HEADING "Member List"
+#define MEMBER_SUBHEADING "ID\tName\t\t\t\t  # Lent"
+#define EQUIPMENT_CHANGE_HEADING "Change Equipment Amount"
+#define NEW_MEMBER_HEADING "Add New Memeber"
+#define NEW_EQUIPMENT_HEADING "Add New Equipment"
+#define DELETE_MEMBER_HEADING "Delete Member"
+#define ABORT_HEADING "Abort"
+#define LOAN_EQUIPMENT_HEADING "Loan Equipment"
+#define RETURN_EQUIPMENT_HEADING "Return Equipment"
 #ifndef ETS_OPTIONS
 #define ETS_OPTIONS
-
-/* This an example of one of the menu functions.
- * You will need to write one for each option.
- * Each one can only take one argument, a pointer to struct ets
- * Each returns a BOOLEAN, which indicates a success or not
- */
 BOOLEAN loan_equipment(struct ets *);
 BOOLEAN return_equipment(struct ets *);
 BOOLEAN query_equipment_id(struct ets *);

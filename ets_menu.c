@@ -37,10 +37,19 @@ void menu_init(struct menu_item  menu[])
 void menu_print(struct menu_item  menu[])
 {
 	int i;
-	printf("Main Menu\n");
+	printf("%s\n",MAIN_MENU_HEADING);
+	for(i = 0; i < strlen(MAIN_MENU_HEADING); i++)
+	{
+		printf("-");
+	}
+	printf("\n");
+	printf("Main Menu:\n");
 	for(i = 0; i < NUM_MENU_ITEMS; i++)
 	{
-		printf("\t%d. %s\n", i + 1, menu[i].name);
+		if(i <= 8)
+			printf("     %d. %s\n", i + 1, menu[i].name);
+		else
+			printf("    %d. %s\n", i + 1, menu[i].name);
 	}
 	printf("\n");
 }

@@ -20,6 +20,7 @@ int main(int argc, char * argv[])
 	int selection;
 	struct menu_item menu_items[NUM_MENU_ITEMS];
 	BOOLEAN exit = FALSE;
+	BOOLEAN load_success;
 	if(argc != NUMARGS)
 	{
 		fprintf(stderr,"Fatal Error: Must have %d number of command line arguments\n",NUMARGS);
@@ -27,7 +28,9 @@ int main(int argc, char * argv[])
 		return EXIT_FAILURE;
 	}
 	ets_init(&ets);
-	load_data(&ets, argv[1], argv[2], argv[3]);
+	load_success = load_data(&ets, argv[1], argv[2], argv[3]);
+	if(load_success == FALSE)
+		return EXIT_FAILURE;
 	combine_members_loans(&ets);
 	combine_items_loans(&ets);
 	menu_init(menu_items);    

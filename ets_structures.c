@@ -55,6 +55,11 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 		while(token != NULL)
 		{
 			tokens[field_type] = token;
+			if(is_valid_item(token, field_type) == FALSE)
+			{
+				printf("Corrupt file, exiting\n");
+				return FALSE;
+			}
 			field_type++;
 			token = strtok(NULL, DELIMETER);
 		}
@@ -80,6 +85,11 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 		while(token != NULL)
 		{
 			tokens[member_field_type] = token;
+			if(is_valid_member(token, member_field_type) == FALSE)
+			{
+				printf("Corrupt file, exiting\n");
+				return FALSE;
+			}
 			member_field_type++;
 			token = strtok(NULL, DELIMETER);
 		}
@@ -104,6 +114,11 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 		while(token != NULL)
 		{
 			tokens[loan_field_type] = token;
+			if(is_valid_loan(token, loan_field_type) == FALSE)
+			{
+				printf("Corrupt file, exiting\n");
+				return FALSE;
+			}
 			loan_field_type++;
 			token = strtok(NULL, DELIMETER);
 		}
@@ -456,4 +471,142 @@ BOOLEAN delete_member_node(struct ets_list *list, char *member_id, struct ets_it
 	free_node(curr);
 	return TRUE;
 }
+BOOLEAN is_valid_item(char *field, enum ets_fields field_type)
+{
+	switch(field_type)
+	{
+		case ITEM_ID:
+			if(strlen(field) > IDLEN || field[0] != 'E')
+			{
+				printf("Starting letter must be an \'E\'\n");
+				return FALSE;
+			}
+			break;
+		case ITEM_NAME:
+			if(strlen(field) > NAMELEN)
+			{
+				printf("String is too bog\n");
+				return FALSE;
+			}
+			break;
+		case ITEM_AVAILABILITY:
+			if(is_unsigned(field) == FALSE)
+				return FALSE;
+	}
+	return TRUE;
+}
+BOOLEAN is_valid_member(char *field, enum member_fields field_type)
+{
+	switch(field_type)
+	{
+		case MEMBER_ID:
+			if(strlen(field) > IDLEN || field[0] != 'M')
+			{
+				printf("Starting letter must be an \'M\'\n");
+				return FALSE;
+			}
+			break;
+		case FIRST_NAME:
+			if(strlen(field) > NAMELEN)
+			{
+				printf("String is too big\n");
+				return FALSE;
+			}
+			break;
+		case LAST_NAME:
+			if(strlen(field) > NAMELEN)
+			{
+				printf("String is too big\n");
+				return FALSE;
+			}
+			break;
+	}
+	return TRUE;
+}
 
+BOOLEAN is_valid_loan(char *field, enum loan_fields field_type)
+{
+	switch(field_type)
+	{
+		case BORROWER_ID:
+			if(field[0] != 'M' || strlen(field) > IDLEN)
+			{
+				return FALSE;
+			}
+			break;
+		case BORROWEE_ID:
+			if(field[0] != 'E' || strlen(field) > IDLEN)
+			{
+				return FALSE;
+			}
+			break;
+		case ITEMS_BORROWED:
+			if(is_unsigned(field) == FALSE)
+				return FALSE;
+	}
+	return TRUE;
+}
+
+BOOLEAN save_item_data(struct ets * ets, FILE * itemFp)
+{
+	/* Get head of list as starting node */
+	struct ets_node * node = ets->items_list->head;
+	if(!itemFp)
+		return FALSE;
+	while(node)
+	{       
+		/* Print node -> data to file */
+		fprintf(itemFp, "%s|%s|%u\n",node->data->itemId, node->data->itemName, node->data->items_borrowed);
+		/* get next node */
+		node = node->next;
+	}
+	return TRUE;
+}
+
+BOOLEAN save_member_data(struct ets * ets, FILE * memberFp)
+{
+	/* Get head of list as starting node */
+	struct ets_node * node = ets->members_list->head;
+	if(!memberFp)
+		return FALSE;
+	while(node)
+	{       
+		/* Print node -> data to file */
+		fprintf(memberFp, "%s|%s|%s\n",node->data->memberId, node->data->firstName, node->data->lastName);
+		/* get next node */
+		node = node->next;
+	}
+	return TRUE;
+}
+
+BOOLEAN save_loan_data(struct ets * ets, FILE * loanFp)
+{
+	/* Get head of list as starting node */
+	struct ets_node * node = ets->loans_list->head;
+	if(!loanFp)
+		return FALSE;
+	while(node)
+	{       
+		/* Print node -> data to file */
+		fprintf(loanFp, "%s|%s|%u\n",node->data->borrowerId, node->data->borroweeId, node->data->items_borrowed);
+		/* get next node */
+		node = node->next;
+	}
+	return TRUE;
+}
+
+void print_item(struct ets * ets, char *itemId)
+{
+	struct ets_node *item_node;
+	struct ets_item *item_data;
+	item_node = ets->items_list->head;
+	while(item_node != NULL)
+	{
+		item_data = item_node->data;
+		if(strcmp(item_data->itemId, itemId) == 0)
+		{
+			printf("%s\t%s x %u\n",item_data->itemId,item_data->itemName,item_data->available);
+		}
+		item_node = item_node->next;
+	}
+}

@@ -39,6 +39,7 @@ enum string_result get_string(char *s, unsigned size, FILE *stream)
 	
 	else
 	{
+		printf("Entered string is too long\n");
 		read_rest_of_line();
 		return STRING_TOOLONG;
 	}
@@ -69,6 +70,7 @@ enum int_result get_int(int *n, unsigned size, int min, int max, FILE *stream)
 		}
 		else if(temp_int < min || temp_int > max + 1)
 		{
+			printf("Integer is out of range\n");
 			printf("Please enter an integer between %d and %d\n",min, max + 1);
 			return INT_OUTOFRANGE;
 		}
