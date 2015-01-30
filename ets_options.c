@@ -592,6 +592,8 @@ BOOLEAN change_equipment_amount(struct ets * ets)
 					printf("Invalid quantity, try again (ctrl-d to exit to main menu)\n");
 				}
 			}
+			if(item_data->total == item_data->available)
+				item_data->total = (unsigned)quantity;
 			item_data->available = (unsigned)quantity;
 		}
 		curr_node = curr_node->next;
