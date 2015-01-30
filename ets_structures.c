@@ -54,7 +54,6 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 		field_type = ITEM_ID;
 		token = strtok(line, DELIMETER);
 		num_fields = 0;
-		printf("Why isn't this printing?\n");
 		while(token != NULL)
 		{
 			tokens[field_type] = token;
@@ -433,7 +432,6 @@ BOOLEAN find_loan(struct ets * ets, char *item_needle, char *member_needle)
 			return TRUE;
 		curr_node = curr_node->next;
 	}
-	printf("No member with id as %s has outstanding loans of item with id %s\n",member_needle, item_needle);
 	return FALSE;
 }
 BOOLEAN delete_item_node(struct ets_list *list, char *item_id, struct ets_item *removed_item)
@@ -524,12 +522,12 @@ BOOLEAN is_valid_item(char *field, enum ets_fields field_type)
 	switch(field_type)
 	{
 		case ITEM_ID:
-			if(strlen(field) > IDLEN || field[0] != 'E')
+			if(strlen(field) != IDLEN || field[0] != 'E')
 			{
 				if(field[0] != 'E')
 					printf("Starting letter must be an \'E\'\n");
 				else
-					printf("Id length cannot be greater than %d\n",IDLEN);
+					printf("Id length must be %d\n",IDLEN);
 				return FALSE;
 			}
 			break;
@@ -551,12 +549,12 @@ BOOLEAN is_valid_member(char *field, enum member_fields field_type)
 	switch(field_type)
 	{
 		case MEMBER_ID:
-			if(strlen(field) > IDLEN || field[0] != 'M')
+			if(strlen(field) != IDLEN || field[0] != 'M')
 			{
 				if(field[0] != 'M')
 					printf("Starting letter must be an \'M\'\n");
 				else
-					printf("Id length cannot be greater than %d\n",IDLEN);
+					printf("Id length must be %d\n",IDLEN);
 				return FALSE;
 			}
 			break;
@@ -585,6 +583,11 @@ BOOLEAN is_valid_loan(char *field, enum loan_fields field_type)
 		case BORROWER_ID:
 			if(field[0] != 'M' || strlen(field) > IDLEN)
 			{
+				return FALSE;
+			}
+			if(strlen(field) < IDLEN)
+			{
+				printf("Member Id must have 5 characters\n");
 				return FALSE;
 			}
 			break;
@@ -715,3 +718,52 @@ BOOLEAN save_item_data(struct ets * ets, FILE * equipFp)
 	return TRUE;
 }
 
+BOOLEAN combine_members_loans2(struct ets * ets)
+{
+	struct ets_node *curr_member;
+	struct ets_item *member_data;
+	struct ets_node *curr_loan;
+	struct ets_item *loan_data;
+	if(!ets)
+		return FALSE;
+	if(ets->members_list->length == 0)
+	{
+		return TRUE;
+	}
+	curr_member = ets->members_list->head;
+	while(curr_member != NULL)
+	{
+		member_data = curr_member->data;
+		curr_loan = ets->loans_list->head;
+		while(curr_loan != NULL)
+		{
+			loan_data = curr_loan->data;
+			if(strcmp(member_data->memberId, loan_data->borrowerId) == 0)
+			{
+				strcpy(loan_data->firstName, member_data->firstName);
+				strcpy(loan_data->lastName, member_data->lastName);
+				strcpy(member_data->itemId, loan_data->borroweeId);
+			}
+			curr_loan = curr_loan->next;
+		}
+		curr_member = curr_member->next;
+	}
+	return TRUE;
+}
+
+void add_to_existing_loan(struct ets * ets, char *item_needle, char *member_needle, unsigned amount)
+{
+	struct ets_node *curr_node;
+	struct ets_item *curr_data;
+	curr_node = ets->loans_list->head;
+	while(curr_node != NULL)
+	{
+		curr_data = curr_node->data;
+		if(strcmp(curr_data->borroweeId, item_needle) == 0 && strcmp(curr_data->borrowerId, member_needle) == 0)
+		{
+			curr_data->items_borrowed += amount;
+		}
+		curr_node = curr_node->next;
+	}
+	
+}

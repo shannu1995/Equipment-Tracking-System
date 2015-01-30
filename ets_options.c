@@ -199,6 +199,10 @@ BOOLEAN loan_equipment(struct ets * ets)
 		create_loans(loan_data, member_data->memberId, item_data->itemId, quantity);
 		add_node(ets->loans_list, loan_data);
 	}
+	else
+	{
+		add_to_existing_loan(ets, itemId, memId, quantity);
+	}
 	display_member_info(ets, memId);
 	return TRUE;
 }
@@ -263,6 +267,7 @@ BOOLEAN return_equipment(struct ets * ets)
 				return FALSE;
 			else
 			{
+				printf("No member with id as %s has loaned an item with id as %s\n",memberId, itemId);
 				printf("Invalid\n");
 				printf("%s",MEMBER_PROMPT);
 				result1 = get_string(memberId,IDLEN + 2,stdin);
@@ -333,7 +338,7 @@ BOOLEAN query_equipment_id(struct ets * ets)
 			while(curr_loan != NULL)
 			{
 				loan_data = curr_loan->data;
-				if(strcmp(item_data->itemId, loan_data->borroweeId) == 0)
+				if(strcmp(item_data->itemId, loan_data->borroweeId) == 0 && loan_data->items_borrowed > 0)
 				{
 					printf("\t  %s %s %s x %u\n",loan_data->borrowerId, loan_data->firstName, loan_data->lastName, loan_data->items_borrowed);
 				}
@@ -428,7 +433,7 @@ BOOLEAN display_loan_list(struct ets * ets)
 		while(curr_loan != NULL)
 		{
 			loan_data = curr_loan->data;
-			if(strcmp(member_data->memberId, loan_data->borrowerId) == 0)
+			if(strcmp(member_data->memberId, loan_data->borrowerId) == 0 && loan_data->items_borrowed > 0)
 			{
 				printf("\t  %s %s x %u\n",loan_data->borroweeId, loan_data->itemName, loan_data->items_borrowed);
 			}
@@ -441,15 +446,29 @@ BOOLEAN display_loan_list(struct ets * ets)
 
 BOOLEAN save(struct ets * ets)
 {
-	FILE * itemFp = fopen(ets->equip_file, "w");
+	FILE *itemFp = fopen(ets->equip_file, "w");
+	FILE *memberFp = fopen(ets->member_file, "w");
+	FILE *loanFp = fopen(ets->loan_file, "w");
 	if(!ets)
 		return FALSE;
 	if(!itemFp)
 	{
 		printf("Cannot open equipment file\n");
-			return FALSE;
+		return FALSE;
+	}
+	if(!memberFp)
+	{
+		printf("Cannot open members file\n");
+		return FALSE;
+	}
+	if(!loanFp)
+	{
+		printf("Cannot open loans file\n");
+		return FALSE;
 	}
 	save_item_data(ets, itemFp);
+	save_member_data(ets, memberFp);
+	save_loan_data(ets, loanFp);
 	return TRUE;
 }
 
@@ -628,6 +647,8 @@ BOOLEAN add_member(struct ets * ets)
 			printf("Invalid last name, try again (ctrl-d to exit)\n");
 		}
 	}
+	printf("New member added:\n");
+	printf("          %s %s %s\n",id,fname,lname);
 	member = malloc(sizeof *(member));
 	memset(member, 0, sizeof *member);
 	create_member(member, id, fname, lname);
@@ -685,10 +706,26 @@ BOOLEAN delete_member(struct ets * ets)
 
 BOOLEAN abort_program(struct ets * ets)
 {
-	char prompt;
-	printf("Do you wish to abort ets (all data will be lost)? (Y/n):");
-	prompt = getc(stdin);
-	if(prompt == 'Y')
-		return TRUE;
+	char prompt[3];
+	enum string_result result;
+	BOOLEAN aborting = FALSE;
+	while(aborting == FALSE)
+	{
+		printf("Do you wish to abort ets (all data will be lost)? (Y/n):");
+		result = get_string(prompt, 3, stdin);
+		if(result == STRING_EMPTY)
+			return FALSE;
+		if(strcmp(prompt,"Y") == 0)
+			return TRUE;
+		else
+		{
+			if(strcmp(prompt, "n") == 0 || strcmp(prompt, "N") == 0)
+				return FALSE;
+			else
+			{
+				printf("Invalid prompt\n");
+			}
+		}
+	}
 	return FALSE;
 }
