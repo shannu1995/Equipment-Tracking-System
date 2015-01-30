@@ -14,7 +14,7 @@
 #define ITEM_PROMPT "Please enter the equipment ID: "
 #define QUANTITY_PROMPT "Please enter the quantity: "
 #define MEMBER_HEADING "Member List"
-#define MEMBER_SUBHEADING "ID\tName\t\t\t\t  # Lent"
+#define MEMBER_SUBHEADING "ID      Name                             # Lent"
 #define EQUIPMENT_CHANGE_HEADING "Change Equipment Amount"
 #define NEW_MEMBER_HEADING "Add New Memeber"
 #define NEW_EQUIPMENT_HEADING "Add New Equipment"
@@ -22,6 +22,9 @@
 #define ABORT_HEADING "Abort"
 #define LOAN_EQUIPMENT_HEADING "Loan Equipment"
 #define RETURN_EQUIPMENT_HEADING "Return Equipment"
+#define LOAN_LIST "Loan List"
+#define QUERY_MEMBER_HEADING "Query Member ID" 
+#define QUERY_EQUIPMENT_HEADING "Query Equipment ID"
 #ifndef ETS_OPTIONS
 #define ETS_OPTIONS
 BOOLEAN loan_equipment(struct ets *);

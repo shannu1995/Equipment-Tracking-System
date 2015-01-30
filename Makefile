@@ -20,7 +20,7 @@ SOURCES = ets_main.c ets_menu.c ets_structures.c ets_utility.c ets_options.c
 OBJS = $(SOURCES:.c=.o) 
 HEADERS = *.h
 USER = s3453738
-ARCHIVE_FILES = *.c *.h Makefile
+ARCHIVE_FILES = *.c *.h Makefile README.md
 EXE = ets
 
 all:		$(EXE)
@@ -44,4 +44,4 @@ archive:
 		  zip $(USER) $(ARCHIVE_FILES) 
 archive:
 	zip $(USER) ets_main.c ets_options.c ets_options.h ets_type.h \
-	ets_menu.c ets_menu.h ets_utility.h ets_utility.c Makefile readme.txt
+	ets_menu.c ets_menu.h ets_utility.h ets_utility.c ets_structures.h ets_structures.c Makefile README.md

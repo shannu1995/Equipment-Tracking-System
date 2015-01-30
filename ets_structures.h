@@ -11,6 +11,7 @@
 #ifndef ETS_STRUCTURES
 #define ETS_STRUCTURES
 #include "ets_utility.h"
+#define MEMBER_SUBHEADING "ID      Name                             # Lent"
 /* this will remove warnings on unused variables in the skeleton code */
 #define UNUSED(var) (void)var
 #define NUMARGS 4
@@ -93,4 +94,6 @@ BOOLEAN is_valid_loan(char *field, enum loan_fields field_type);
 BOOLEAN save_item_data(struct ets * ets, FILE * itemFp);
 BOOLEAN save_member_data(struct ets * ets, FILE * memberFp);
 BOOLEAN save_loan_data(struct ets * ets, FILE * loanFp);
+void print_member(struct ets * ets, char *memberId);
+void display_member_info(struct ets * ets, char *id);
 #endif

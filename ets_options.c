@@ -60,10 +60,8 @@ BOOLEAN display_member_list(struct ets * ets)
 	}
 	printf("\n");
 	printf("%s\n",MEMBER_SUBHEADING);
-	for(i = 0; i < strlen(MEMBER_SUBHEADING) + 30; i++)
-	{
+	for(i = 1; i <= strlen(MEMBER_SUBHEADING); i++)
 		printf("-");
-	}
 	printf("\n");
 	if(!ets)
 		return FALSE;
@@ -95,6 +93,8 @@ BOOLEAN loan_equipment(struct ets * ets)
 	struct ets_item *item_data;
 	struct ets_item *loan_data;
 	char id[IDLEN + 2];
+	char memId[IDLEN + 2];
+	char itemId[IDLEN + 2];
 	int i;
 	enum string_result result;
 	enum int_result res;
@@ -115,6 +115,7 @@ BOOLEAN loan_equipment(struct ets * ets)
 		if(result == STRING_SUCCESS && find_member(ets, id) == TRUE)
 		{
 			is_valid_id = TRUE;
+			print_member(ets, id);
 			break;
 		}
 		else
@@ -130,11 +131,11 @@ BOOLEAN loan_equipment(struct ets * ets)
 		member_data = curr_node->data;
 		if(strcmp(member_data->memberId, id) == 0)
 		{
-			printf("%s %s %s x %u\n",member_data->memberId, member_data->lastName, member_data->firstName, member_data->items_borrowed);
 			break;
 		}
 		curr_node = curr_node->next;
 	}
+	strcpy(memId, id);
 	printf("%s",ITEM_PROMPT);
 	is_valid_id = FALSE;
 	do
@@ -160,6 +161,7 @@ BOOLEAN loan_equipment(struct ets * ets)
 		item_data = curr_node->data;
 		if(strcmp(item_data->itemId, id) == 0)
 		{
+			strcpy(itemId,id);
 			printf("%s %s x %u\n",item_data->itemId, item_data->itemName, item_data->total);
 			printf("%s",QUANTITY_PROMPT);
 			res = get_int(&quantity, BUFFER_SIZE, 1, 9999,stdin);
@@ -190,10 +192,14 @@ BOOLEAN loan_equipment(struct ets * ets)
 			}
 		}
 	}
-	loan_data = malloc(sizeof *loan_data);
-	memset(loan_data, 0, sizeof *loan_data);
-	create_loans(loan_data, member_data->memberId, item_data->itemId, quantity);
-	add_node(ets->loans_list, loan_data);
+	if(find_loan(ets, itemId, memId) == FALSE)
+	{
+		loan_data = malloc(sizeof *loan_data);
+		memset(loan_data, 0, sizeof *loan_data);
+		create_loans(loan_data, member_data->memberId, item_data->itemId, quantity);
+		add_node(ets->loans_list, loan_data);
+	}
+	display_member_info(ets, memId);
 	return TRUE;
 }
 
@@ -288,7 +294,12 @@ BOOLEAN query_equipment_id(struct ets * ets)
 	struct ets_node *curr_loan;
 	struct ets_item *loan_data;
 	char line[BUFFER_SIZE];
+	int i;
 	BOOLEAN is_valid_id = FALSE;
+	printf("%s\n",QUERY_EQUIPMENT_HEADING);
+	for(i = 1; i <= strlen(QUERY_EQUIPMENT_HEADING); i++)
+		printf("-");
+	printf("\n");
 	printf("%s",ITEM_PROMPT);
 	result = get_string(line,IDLEN + 2,stdin);
 	printf("\n");
@@ -314,6 +325,10 @@ BOOLEAN query_equipment_id(struct ets * ets)
 		if(strcmp(item_data->itemId, line) == 0)
 		{
 			curr_loan = ets->loans_list->head;
+			printf("%s\n",MEMBER_SUBHEADING);
+			for(i = 1; i <= strlen(MEMBER_SUBHEADING); i++)
+			printf("-");
+			printf("\n");
 			printf("%s\t%s\t\t\t%u\n",item_data->itemId,item_data->itemName,item_data->available - item_data->total);
 			while(curr_loan != NULL)
 			{
@@ -338,9 +353,15 @@ BOOLEAN query_member_id(struct ets * ets)
 	struct ets_item *loan_data;
 	enum string_result result;
 	char line[BUFFER_SIZE];
+	int i;
 	BOOLEAN is_valid_id = FALSE;
-	printf("%s",MEMBER_PROMPT);
+	printf("%s\n",QUERY_MEMBER_HEADING);
+	for(i = 1; i <= strlen(QUERY_MEMBER_HEADING); i++)
+	{
+		printf("-");
+	}
 	printf("\n");
+	printf("%s",MEMBER_PROMPT);
 	result = get_string(line,IDLEN + 2,stdin);
 	member_node = ets->members_list->head;
 	while(is_valid_id == FALSE)
@@ -366,6 +387,10 @@ BOOLEAN query_member_id(struct ets * ets)
 		if(strcmp(member_data->memberId, line) == 0)
 		{
 			curr_loan = ets->loans_list->head;
+			printf("%s\n",MEMBER_SUBHEADING);
+			for(i = 1; i <= strlen(MEMBER_SUBHEADING); i++)
+				printf("-");
+			printf("\n");
 			printf("%s\t%s %s\t\t\t%u\n",member_data->memberId,member_data->lastName,member_data->firstName,member_data->items_borrowed);
 			while(curr_loan != NULL)
 			{
@@ -388,7 +413,12 @@ BOOLEAN display_loan_list(struct ets * ets)
 	struct ets_item *member_data;
 	struct ets_node *curr_loan;
 	struct ets_item *loan_data;
+	int i;
 	member_node = ets->members_list->head;
+	printf("%s\n",MEMBER_SUBHEADING);
+	for(i = 1; i <= strlen(MEMBER_SUBHEADING); i++)
+		printf("-");
+	printf("\n");
 	while(member_node != NULL)
 	{
 		member_data = member_node->data;
@@ -411,51 +441,16 @@ BOOLEAN display_loan_list(struct ets * ets)
 
 BOOLEAN save(struct ets * ets)
 {
-   FILE * itemFp = fopen(ets->equip_file, "w");
-   FILE * memberFp = fopen(ets->member_file, "w");
-   FILE * loanFp = fopen(ets->loan_file, "w");
-   /* Open files */
-   if(!itemFp) {
-      perror("Failed to open item file, cannot save");
-      ets_free(ets);
-      return FALSE;
-   }  
-   if(!memberFp)
-   {
-	   perror("Failed to open member file, cannot save");
-	   ets_free(ets);
-	   return FALSE;
-   }
-   if(!loanFp)
-   {
-	   perror("Failed to open laons file, cannot save");
-	   ets_free(ets);
-	   return FALSE;
-   }
-   /* Save item data */
-   if(!save_item_data(ets, itemFp))
-   {
-      fprintf(stderr, "Error saving items file (%s) \n", ets->equip_file);
-   }
-   
-   /* Save member data */
-   if(!save_member_data(ets, memberFp))
-   {
-      fprintf(stderr, "Error parsing members file (%s) \n", ets->member_file);
-   }
-   
-   if(!save_loan_data(ets, loanFp))
-   {
-	   fprintf(stderr, "Error parsing loans file\n");
-   }
-   fclose(itemFp);
-   fclose(memberFp);
-   fclose(loanFp);
-
-   /* Free system and exit to main */
-   ets_free(ets);
-
-   return TRUE;
+	FILE * itemFp = fopen(ets->equip_file, "w");
+	if(!ets)
+		return FALSE;
+	if(!itemFp)
+	{
+		printf("Cannot open equipment file\n");
+			return FALSE;
+	}
+	save_item_data(ets, itemFp);
+	return TRUE;
 }
 
 BOOLEAN add_equipment(struct ets * ets)
@@ -691,14 +686,9 @@ BOOLEAN delete_member(struct ets * ets)
 BOOLEAN abort_program(struct ets * ets)
 {
 	char prompt;
-	printf("Do you wish to abort ets (all data will be lost)? (Y/n)");
+	printf("Do you wish to abort ets (all data will be lost)? (Y/n):");
 	prompt = getc(stdin);
-	while(prompt != 'Y' && prompt != 'n')
-	{
-		printf("\nInvalid character entered, try again\n");
-		printf("Do you wish to abort ets (all data will be lost)? (Y/n)");
-		read_rest_of_line();
-		prompt = getc(stdin);
-	}
+	if(prompt == 'Y')
+		return TRUE;
 	return FALSE;
 }
