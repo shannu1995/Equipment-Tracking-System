@@ -342,6 +342,10 @@ BOOLEAN combine_items_loans(struct ets * ets)
 				strcpy(item_data->firstName, loan_data->firstName);
 				strcpy(item_data->lastName, loan_data->lastName);
 				item_data->total = item_data->available - loan_data->items_borrowed;
+				if(loan_data->items_borrowed == 0)
+				{
+					delete_loan_node(ets->loans_list,loan_data->borroweeId,loan_data);
+				}
 			}
 			curr_loan = curr_loan->next;
 		}
@@ -385,7 +389,6 @@ BOOLEAN combine_members_loans(struct ets * ets)
 	}
 	return TRUE;
 }
-
 BOOLEAN find_item(struct ets * ets, char *needle)
 {
 	struct ets_node  *curr_node;
@@ -766,4 +769,44 @@ void add_to_existing_loan(struct ets * ets, char *item_needle, char *member_need
 		curr_node = curr_node->next;
 	}
 	
+}
+
+BOOLEAN delete_loan_node(struct ets_list *list, char *itemId, struct ets_item *removed_item)
+{
+	struct ets_node *prev, *curr;
+	if(list == NULL || itemId == NULL)
+	{
+		return  FALSE;
+	}    
+	prev = NULL;
+	curr = list->head;
+	/* Traverse through list until the item with the given id is found or
+	* the end of the list is reached */
+	while(curr != NULL && strcmp(itemId, curr->data->borroweeId) != 0)
+	{
+		prev = curr;
+		curr = curr->next;
+	}
+	    
+	/* Check if item was found */
+	if (curr == NULL)
+	{
+		return FALSE;
+	}    
+	/* Copy data from node being removed to the removed_item pointer for
+	* printing */
+	memcpy(removed_item, curr->data, sizeof *(curr->data));   
+	/* Remove desired node from list and change the link from the node before
+	* it to point to the next node in the list */
+	if(prev == NULL)
+	{
+		/* Node to delete is at head of list */
+		list->head = curr->next;
+	}
+	else
+	{
+		prev->next = curr->next;
+	}
+	free_node(curr);
+	return TRUE;
 }

@@ -284,6 +284,7 @@ BOOLEAN return_equipment(struct ets * ets)
 		if(strcmp(member_data->memberId,memberId) == 0)
 		{
 			member_data->items_borrowed -= quantity;
+			display_member_info(ets, member_data->memberId);
 			return TRUE;
 		}
 		curr_member = curr_member->next;
@@ -340,7 +341,7 @@ BOOLEAN query_equipment_id(struct ets * ets)
 				loan_data = curr_loan->data;
 				if(strcmp(item_data->itemId, loan_data->borroweeId) == 0 && loan_data->items_borrowed > 0)
 				{
-					printf("\t  %s %s %s x %u\n",loan_data->borrowerId, loan_data->firstName, loan_data->lastName, loan_data->items_borrowed);
+					printf("\t  %s %s %s x %u\n",loan_data->borrowerId, loan_data->lastName, loan_data->firstName, loan_data->items_borrowed);
 				}
 				curr_loan = curr_loan->next;
 			}
