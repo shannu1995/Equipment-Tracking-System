@@ -49,7 +49,7 @@ int main(int argc, char * argv[])
 		}
 		if(selection != 13 && selection != 8)
 			menu_items[selection - 1].func(&ets);
-		combine_items_loans(&ets);
+		/*combine_items_loans(&ets);*/
 		combine_members_loans2(&ets);
 	}
 	while(exit == FALSE);

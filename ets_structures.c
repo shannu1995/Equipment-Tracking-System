@@ -389,6 +389,7 @@ BOOLEAN combine_members_loans(struct ets * ets)
 	}
 	return TRUE;
 }
+
 BOOLEAN find_item(struct ets * ets, char *needle)
 {
 	struct ets_node  *curr_node;
@@ -768,7 +769,6 @@ void add_to_existing_loan(struct ets * ets, char *item_needle, char *member_need
 		}
 		curr_node = curr_node->next;
 	}
-	
 }
 
 BOOLEAN delete_loan_node(struct ets_list *list, char *itemId, struct ets_item *removed_item)
@@ -810,3 +810,40 @@ BOOLEAN delete_loan_node(struct ets_list *list, char *itemId, struct ets_item *r
 	free_node(curr);
 	return TRUE;
 }
+
+BOOLEAN item_borrowed(struct ets * ets, char * itemId, unsigned quantity)
+{
+	struct ets_node *curr_node;
+	struct ets_item *item_data;
+	curr_node = ets->items_list->head;
+	while(curr_node != NULL)
+	{
+		item_data = curr_node->data;
+		if(strcmp(itemId, item_data->itemId) == 0)
+		{
+			item_data->total -= quantity;
+			return TRUE;
+		}
+		curr_node = curr_node->next;
+	}
+	return FALSE;
+}
+
+BOOLEAN item_returned(struct ets * ets, char * itemId, unsigned quantity)
+{
+	struct ets_node *curr_node;
+	struct ets_item *item_data;
+	curr_node = ets->items_list->head;
+	while(curr_node != NULL)
+	{
+		item_data = curr_node->data;
+		if(strcmp(itemId, item_data->itemId) == 0)
+		{
+			item_data->total += quantity;
+			return TRUE;
+		}
+		curr_node = curr_node->next;
+	}
+	return FALSE;
+}
+

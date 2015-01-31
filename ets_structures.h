@@ -95,7 +95,9 @@ BOOLEAN is_valid_loan(char *field, enum loan_fields field_type);
 BOOLEAN save_item_data(struct ets * ets, FILE * itemFp);
 BOOLEAN save_member_data(struct ets * ets, FILE * memberFp);
 BOOLEAN save_loan_data(struct ets * ets, FILE * loanFp);
+BOOLEAN item_borrowed(struct ets * ets, char * itemId, unsigned quantity);
 void print_member(struct ets * ets, char *memberId);
 void display_member_info(struct ets * ets, char *id);
 void add_to_existing_loan(struct ets * ets, char *memberId, char *itemId, unsigned amount);
+BOOLEAN item_returned(struct ets * ets, char * itemId, unsigned quantity);
 #endif

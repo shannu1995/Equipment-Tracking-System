@@ -176,7 +176,6 @@ BOOLEAN loan_equipment(struct ets * ets)
 		{
 			is_valid_quantity = TRUE;
 			member_data->items_borrowed += (unsigned)quantity;
-			item_data->total -= (unsigned)quantity;
 		}
 		else
 		{
@@ -192,8 +191,9 @@ BOOLEAN loan_equipment(struct ets * ets)
 			}
 		}
 	}
-	if(find_loan(ets, itemId, memId) == FALSE)
+	if(find_loan(ets, itemId, memId) == FALSE )
 	{
+		item_borrowed(ets, itemId, quantity);
 		loan_data = malloc(sizeof *loan_data);
 		memset(loan_data, 0, sizeof *loan_data);
 		create_loans(loan_data, member_data->memberId, item_data->itemId, quantity);
@@ -285,6 +285,7 @@ BOOLEAN return_equipment(struct ets * ets)
 		{
 			member_data->items_borrowed -= quantity;
 			display_member_info(ets, member_data->memberId);
+			item_returned(ets, itemId, quantity);
 			return TRUE;
 		}
 		curr_member = curr_member->next;
@@ -502,7 +503,7 @@ BOOLEAN add_equipment(struct ets * ets)
 	printf("Please enter the total quantity: ");
 	while(!is_valid_quantity)
 	{
-		unsigned_result = get_int(&quantity,BUFFER_SIZE, 1, 99, stdin);
+		unsigned_result = get_int(&quantity,BUFFER_SIZE, 1, 9999, stdin);
 		printf("\n");
 		if(unsigned_result == INT_SUCCESS && quantity > 0)
 			is_valid_quantity = TRUE;
@@ -517,6 +518,7 @@ BOOLEAN add_equipment(struct ets * ets)
 	memset(item, 0, sizeof *item);
 	create_item(item, id, name, (unsigned)quantity);
 	add_node(ets->items_list, item);
+	combine_items_loans(ets);
 	return FALSE;
 }
 
