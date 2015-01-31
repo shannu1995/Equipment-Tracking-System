@@ -8,7 +8,5 @@
  * Start up code provided by David Shaw
  * Based on 2014 code by Paul Miller and Virginia King
  **********************************************************************/
- 
- /* This file is for you to provide any extra information that your 
- markers may find useful. For example. Bugs, inconsistencies, incomplete
- functionality, reasoning for design choices etc. */
+
+Have not completed validating data files to see if they are sorted or not.
