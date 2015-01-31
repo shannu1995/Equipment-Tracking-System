@@ -664,7 +664,7 @@ BOOLEAN delete_member(struct ets * ets)
 	enum string_result result;
 	struct ets_item *member;
 	BOOLEAN is_valid_id = FALSE;
-	char prompt;
+	char prompt[3];
 	BOOLEAN prompt_entered = FALSE;
 	member = ets->members_list->head->data;
 	printf("%s",MEMBER_PROMPT);
@@ -685,14 +685,15 @@ BOOLEAN delete_member(struct ets * ets)
 		}
 		
 	}
+	display_member_info(ets, id);
 	while(!prompt_entered)
 	{
 		printf("Are you sure you want to delete this member?  (Y/n)");
-		prompt = getc(stdin);
-		if(prompt == 'Y' || prompt == 'n' || prompt == 'N')
+		result = get_string(prompt, 3, stdin);
+		if(strcmp(prompt,"Y") == 0 || strcmp(prompt,"n") == 0 || strcmp(prompt,"N") == 0)
 			prompt_entered = TRUE;
 	}
-	if(prompt == 'Y')
+	if(strcmp(prompt,"Y") == 0)
 	{
 		if(delete_member_node(ets->members_list, id, member) == TRUE)
 		{
