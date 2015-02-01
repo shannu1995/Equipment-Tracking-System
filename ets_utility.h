@@ -33,12 +33,14 @@ enum string_result
 
 enum int_result
 {
-	INT_STRINGTOOBIG, INT_STRINGEMPTY, INT_NOTINT, INT_OUTOFRANGE, INT_SUCCESS
+	INT_STRINGTOOBIG, INT_STRINGEMPTY, INT_NOTINT,
+	INT_OUTOFRANGE, INT_SUCCESS
 };
 void read_rest_of_line(void);
 enum string_result get_string(char *s, unsigned size, FILE *stream);
 BOOLEAN str_to_unsigned(char *s, unsigned *u);
 BOOLEAN is_unsigned(char *s);
-enum int_result get_int(int *n, unsigned size, int min, int max, FILE *stream);
+enum int_result get_int(int *n, unsigned size, int min,
+	       	int max, FILE *stream);
 #endif
 

@@ -21,11 +21,13 @@ void read_rest_of_line(void)
 enum string_result get_string(char *s, unsigned size, FILE *stream)
 {
 	unsigned len;
+	/*If the user enters ctrl-d*/
 	if(fgets(s, size, stream) == NULL)
 	{
 		return STRING_EMPTY;
 	}    
 	len = strlen(s);
+	/*If the user enters a blank line (\n)*/
 	if(len == 1)
 	{
 		return STRING_EMPTY;
@@ -36,7 +38,7 @@ enum string_result get_string(char *s, unsigned size, FILE *stream)
 		s[len-1] = '\0';
 		return STRING_SUCCESS;
 	}
-	
+	/*If the string is too long*/
 	else
 	{
 		printf("Entered string is too long\n");
@@ -71,7 +73,7 @@ enum int_result get_int(int *n, unsigned size, int min, int max, FILE *stream)
 		else if(temp_int < min || temp_int > max + 1)
 		{
 			printf("Integer is out of range\n");
-			printf("Please enter an integer between %d and %d\n",min, max + 1);
+			printf("Please enter an integer between %d and %d\n",min, max);
 			return INT_OUTOFRANGE;
 		}
 		else
@@ -86,6 +88,7 @@ BOOLEAN str_to_unsigned(char *s, unsigned *u)
 {
 	if(!is_unsigned(s))
 		return FALSE;
+	/*Changes an integer to an unsigned integer*/
 	*u = (unsigned)strtol(s,NULL,10);
 	return TRUE;
 }
@@ -95,6 +98,7 @@ BOOLEAN is_unsigned(char *s)
 	int i;
 	char *end_ptr;
 	i = (int)strtol(s, &end_ptr, 10);
+	/*If *end_ptr is a string, then the entered input is not an integer*/
 	if(i < 0 || strcmp(end_ptr,"") != 0)
 	{
 		return FALSE;

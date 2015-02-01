@@ -1,33 +1,45 @@
 #include "ets_structures.h"
 
-/* initialises the ets data structure to safe initial values. */
+/*Initialises the ets data structure to safe initial values. */
 BOOLEAN ets_init(struct ets * ets)
 {
+	/*If ets is not initialized, return FALSE*/
 	if(!ets)
 		return FALSE;
 	memset(ets, 0, sizeof *ets);
+	/*Allocates memory for the items list*/
 	ets->items_list = malloc(sizeof *(ets->items_list));
+	/*If memory allocation of the items has failed*/
 	if(!ets->items_list)
 		return FALSE;
+	/*Initializing the items list by defaulting values to NULL and zero*/
 	ets->items_list->head = NULL;
 	ets->items_list->length = 0;
+	/*Allocates memory for the loans list*/
 	ets->loans_list = malloc(sizeof *(ets->loans_list));
+	/*If memory allocation of the loans has failed*/
 	if(!ets->loans_list)
 		return FALSE;
+	/*Initializing the loans list by defaulting the values to NULL and zero*/
 	ets->loans_list->head = NULL;
 	ets->loans_list->length = 0;
-	
+	/*Allocates memory for the members list*/
 	ets->members_list = malloc(sizeof *(ets->members_list));
+	/*If memory allocation of members list has failed*/
 	if(!ets->items_list)
 		return FALSE;
+	/*Initializing members by defaulting the values to NULL and zero*/
 	ets->members_list->head = NULL;
 	ets->members_list->length = 0;
 	return TRUE;
 }
 
 /* loads data from the .dat files into memory. */
-BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * member_fname, const char * loan_fname)
+BOOLEAN load_data(struct ets * ets, const char * equip_fname,
+	       	const char * member_fname, const char * loan_fname)
 {
+	/*Everytime a line is read, it is tokenized with the delimeter "|".
+	 * That token is passed into an array of enums.*/
 	FILE *equip_file, *member_file, *loan_file;
 	char line[BUFFER_SIZE];
 	char *token;
@@ -42,14 +54,17 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 	struct ets_item *member;
 	int num_fields;
 	equip_file = fopen(equip_fname, "r");
+	/*Check if equipment file exists or not*/
 	if(!equip_file)
 	{
 		fprintf(stderr, "Cannot open equipment file\n");
 		return FALSE;
 	}
-	while((result = get_string(line, BUFFER_SIZE, equip_file)) != STRING_EMPTY)
+	while((result = get_string(line, BUFFER_SIZE, equip_file))
+		       	!= STRING_EMPTY)
 	{
 		if(result == STRING_TOOLONG)
+			/*If string is too long*/
 			return FALSE;
 		field_type = ITEM_ID;
 		token = strtok(line, DELIMETER);
@@ -68,7 +83,8 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 		}
 		if(num_fields != 3)
 		{
-			fprintf(stderr, "Fatal Error: Number of data fields must be 3, in the %s file, it is %d\n",equip_fname, num_fields);
+			fprintf(stderr, "Fatal Error: Number of data fields must be 3, in the %s file, it is %d\n"
+					,equip_fname, num_fields);
 			return FALSE;
 		}
 		str_to_unsigned(tokens[ITEM_AVAILABILITY],&amount);
@@ -78,6 +94,7 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 			return FALSE;
 		}
 		item = malloc(sizeof *item);
+		/*Initializes all variables to NULL or 0*/
 		memset(item, 0, sizeof *item);
 		create_item(item, tokens[ITEM_ID], tokens[ITEM_NAME], amount);
 		add_node(ets->items_list, item);
@@ -89,7 +106,8 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 		fprintf(stderr, "Cannot open member file\n");
 		return FALSE;
 	}
-	while((result = get_string(line, BUFFER_SIZE, member_file)) != STRING_EMPTY)
+	while((result = get_string(line, BUFFER_SIZE, member_file))
+		       	!= STRING_EMPTY)
 	{
 		if(result == STRING_TOOLONG)
 			return FALSE;
@@ -110,14 +128,17 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 		}
 		if(num_fields != 3)
 		{
-			fprintf(stderr,"Fatal Error: Number of fields must be 3, in the %s file, it is %d\n",member_fname, num_fields);
+			fprintf(stderr,"Fatal Error: Number of fields must be 3, in the %s file, it is %d\n",
+					member_fname, num_fields);
 			return FALSE;
 		}
 		member = malloc(sizeof *member);
 		memset(member, 0, sizeof *member);
-		create_member(member, tokens[MEMBER_ID], tokens[LAST_NAME], tokens[FIRST_NAME]);
+		create_member(member, tokens[MEMBER_ID],
+			       	tokens[LAST_NAME], tokens[FIRST_NAME]);
 		add_member_node(ets->members_list, member);
 	}
+	/*Safely closes the pointer */
 	fclose(member_file);
 	loan_file = fopen(loan_fname, "r");
 	if(!loan_file)
@@ -155,50 +176,61 @@ BOOLEAN load_data(struct ets * ets, const char * equip_fname, const char * membe
 			printf("Number of items must be between 1 and 9999\n");
 			return FALSE;
 		}
+		/*Allocates memory for a loan*/
 		loan = malloc(sizeof *loan);
 		memset(loan, 0, sizeof *loan);
 		create_loans(loan, tokens[BORROWER_ID], tokens[BORROWEE_ID], amount);
 		add_node(ets->loans_list, loan);
 	}
+	/*Safely closing the loan file*/
 	fclose(loan_file);
+	/*Allocates memory to ets->equip_file which can be used for saving
+	 * and exits if allocation fails*/
 	ets->equip_file = (char *) malloc(sizeof(char) * (strlen(equip_fname) + 1));
 	if(!ets->equip_file)
 	{
 		printf("Cannot malloc items_file\n");
 		return FALSE;
 	}
+	/*Allocates memory to ets->member_file and exits if allocation fails*/
 	ets->member_file = (char *) malloc(sizeof(char) * (strlen(member_fname) + 1));
 	if(!ets->member_file)
 	{
 		printf("Cannot malloc member_file\n");
 		return FALSE;
 	}
+	/*Allocates memory to ets->loan_file and exits if allocation fails*/
 	ets->loan_file = (char *) malloc(sizeof(char) * (strlen(loan_fname) + 1));
 	if(!ets->loan_file)
 	{
 		printf("Cannot malloc loan file\n");
 		return FALSE;
 	}
+	/*Copies the equipment file name, member file name and loan file name
+	 *into the strings present in ets*/
 	strcpy(ets->equip_file, equip_fname);
 	strcpy(ets->member_file, member_fname);
 	strcpy(ets->loan_file, loan_fname);
 	return TRUE;
 }
 
-void create_item(struct ets_item *item, char *itemId, char *name, unsigned quantity)
+void create_item(struct ets_item *item, char *itemId, char *name,
+	       	unsigned quantity)
 {
 	strcpy(item->itemId, itemId);
 	strcpy(item->itemName, name);
 	item->available = quantity;
 }
 
-void create_loans(struct ets_item *loan, char *borrowerId, char *borroweeId, unsigned quantity)
+void create_loans(struct ets_item *loan, char *borrowerId, char *borroweeId,
+	       	unsigned quantity)
 {
 	strcpy(loan->borrowerId, borrowerId);
 	strcpy(loan->borroweeId, borroweeId);
 	loan->items_borrowed = quantity;
 }
-void create_member(struct ets_item *member, char *memberId, char *lastName, char *firstName)
+void create_member(struct ets_item *member, char *memberId,
+	       	char *lastName, char *firstName)
 {
 	strcpy(member->memberId, memberId);
 	strcpy(member->lastName, lastName);
@@ -244,11 +276,12 @@ void ets_free(struct ets * ets)
 		node = node->next;
 		free_node(temp);
 	}
-	
+	/*Free the memory of each list*/
 	free(ets->items_list);
 	free(ets->members_list);
 	free(ets->loans_list);
 	ets->items_list = NULL;    
+	/*Free the memory of each file*/
 	free(ets->loan_file);
 	free(ets->equip_file);
 	free(ets->member_file);
@@ -270,6 +303,7 @@ BOOLEAN add_node(struct ets_list *list, struct ets_item *item)
 		return FALSE;
 	memset(new_node, 0, sizeof *new_node);
 	new_node->data = item;
+	/*Add node in an ascending order*/
 	while(curr != NULL && strcmp(item->itemName, curr->data->itemName) > 0)
 	{
 		prev = curr;
@@ -320,6 +354,10 @@ BOOLEAN add_member_node(struct ets_list *list, struct ets_item *member)
 	return TRUE;
 }
 
+/*This function combines items and loans.
+ * it iterates through both the items_list and loans_list.
+ * It updates the number of items lent by subtracting from the loan_data->items_borrowed
+ * */
 BOOLEAN combine_items_loans(struct ets * ets)
 {
 	struct ets_node *curr_item;
@@ -344,7 +382,9 @@ BOOLEAN combine_items_loans(struct ets * ets)
 				item_data->total = item_data->available - loan_data->items_borrowed;
 				if(loan_data->items_borrowed == 0)
 				{
-					delete_loan_node(ets->loans_list,loan_data->borroweeId,loan_data);
+					delete_loan_node(ets->loans_list,
+							loan_data->borroweeId,
+							loan_data);
 				}
 			}
 			curr_loan = curr_loan->next;
@@ -369,18 +409,24 @@ BOOLEAN combine_members_loans(struct ets * ets)
 		return TRUE;
 	}
 	curr_member = ets->members_list->head;
+	/*Outer Loop(member loop)*/
 	while(curr_member != NULL)
 	{
 		member_data = curr_member->data;
 		curr_loan = ets->loans_list->head;
+		/*Inner Loop(member loop)*/
 		while(curr_loan != NULL)
 		{
 			loan_data = curr_loan->data;
 			if(strcmp(member_data->memberId, loan_data->borrowerId) == 0)
 			{
-				strcpy(loan_data->firstName, member_data->firstName);
-				strcpy(loan_data->lastName, member_data->lastName);
-				strcpy(member_data->itemId, loan_data->borroweeId);
+				strcpy(loan_data->firstName,
+					       	member_data->firstName);
+				strcpy(loan_data->lastName,
+					       	member_data->lastName);
+				strcpy(member_data->itemId,
+					       	loan_data->borroweeId);
+				/*updates the number of items_borrowed by adding it with loan_data->items_borrowed*/
 				member_data->items_borrowed += loan_data->items_borrowed;
 			}
 			curr_loan = curr_loan->next;
@@ -432,13 +478,15 @@ BOOLEAN find_loan(struct ets * ets, char *item_needle, char *member_needle)
 	while(curr_node != NULL)
 	{
 		curr_data = curr_node->data;
-		if(strcmp(curr_data->borroweeId, item_needle) == 0 && strcmp(curr_data->borrowerId, member_needle) == 0)
+		if(strcmp(curr_data->borroweeId, item_needle) == 0 &&
+		strcmp(curr_data->borrowerId, member_needle) == 0)
 			return TRUE;
 		curr_node = curr_node->next;
 	}
 	return FALSE;
 }
-BOOLEAN delete_item_node(struct ets_list *list, char *item_id, struct ets_item *removed_item)
+BOOLEAN delete_item_node(struct ets_list *list, char *item_id,
+	       	struct ets_item *removed_item)
 {
 	struct ets_node *prev, *curr;
 	if(list == NULL || item_id == NULL)
@@ -478,7 +526,8 @@ BOOLEAN delete_item_node(struct ets_list *list, char *item_id, struct ets_item *
 	return TRUE;
 }
 
-BOOLEAN delete_member_node(struct ets_list *list, char *member_id, struct ets_item *removed_member)
+BOOLEAN delete_member_node(struct ets_list *list, char *member_id,
+	       	struct ets_item *removed_member)
 {
 	struct ets_node *prev, *curr;
 	if(list == NULL || member_id == NULL)
@@ -523,6 +572,7 @@ BOOLEAN delete_member_node(struct ets_list *list, char *member_id, struct ets_it
 }
 BOOLEAN is_valid_item(char *field, enum ets_fields field_type)
 {
+	/*This functions checks to see if the entered field is valid or not*/
 	switch(field_type)
 	{
 		case ITEM_ID:
@@ -550,6 +600,7 @@ BOOLEAN is_valid_item(char *field, enum ets_fields field_type)
 }
 BOOLEAN is_valid_member(char *field, enum member_fields field_type)
 {
+	/*This functions checks to see if the entered field is valid or not*/
 	switch(field_type)
 	{
 		case MEMBER_ID:
@@ -617,7 +668,8 @@ BOOLEAN save_member_data(struct ets * ets, FILE * memberFp)
 	while(node)
 	{       
 		/* Print node -> data to file */
-		fprintf(memberFp, "%s|%s|%s\n",node->data->memberId, node->data->firstName, node->data->lastName);
+		fprintf(memberFp, "%s|%s|%s\n",node->data->memberId,
+			       	node->data->firstName, node->data->lastName);
 		/* get next node */
 		node = node->next;
 	}
@@ -633,7 +685,9 @@ BOOLEAN save_loan_data(struct ets * ets, FILE * loanFp)
 	while(node)
 	{       
 		/* Print node -> data to file */
-		fprintf(loanFp, "%s|%s|%u\n",node->data->borrowerId, node->data->borroweeId, node->data->items_borrowed);
+		fprintf(loanFp, "%s|%s|%u\n",node->data->borrowerId,
+			       	node->data->borroweeId,
+			       	node->data->items_borrowed);
 		/* get next node */
 		node = node->next;
 	}
@@ -650,7 +704,9 @@ void print_item(struct ets * ets, char *itemId)
 		item_data = item_node->data;
 		if(strcmp(item_data->itemId, itemId) == 0)
 		{
-			printf("%s\t%s x %u\n",item_data->itemId,item_data->itemName,item_data->available);
+			printf("%s\t%s x %u\n",item_data->itemId,
+					item_data->itemName,
+					item_data->available);
 		}
 		item_node = item_node->next;
 	}
@@ -666,7 +722,9 @@ void print_member(struct ets * ets, char *memberId)
 		member_data = member_node->data;
 		if(strcmp(member_data->memberId, memberId) == 0)
 		{
-			printf("%s %s %s\n",member_data->memberId,member_data->lastName,member_data->firstName);
+			printf("%s %s %s\n",member_data->memberId,
+					member_data->lastName,
+					member_data->firstName);
 		}
 		member_node = member_node->next;
 	}
@@ -686,17 +744,20 @@ void display_member_info(struct ets * ets, char *id)
 		if(strcmp(member_data->memberId, id) == 0)
 		{
 			curr_loan = ets->loans_list->head;
-			/*printf("%s\n",MEMBER_SUBHEADING);*/
 			for(i = 1; i <= 50; i++)
 				printf("-");
 			printf("\n");
-			printf("%s\t%s %s\t\t\t%u\n",member_data->memberId,member_data->lastName,member_data->firstName,member_data->items_borrowed);
+			printf("%s\t%s %s\t\t\t%u\n",member_data->memberId,member_data->lastName,
+					member_data->firstName,
+					member_data->items_borrowed);
 			while(curr_loan != NULL)
 			{
 				loan_data = curr_loan->data;
 				if(strcmp(member_data->memberId, loan_data->borrowerId) == 0)
 				{
-					printf("\t  %s %s x %u\n",loan_data->borroweeId, loan_data->itemName, loan_data->items_borrowed);
+					printf("\t  %s %s x %u\n",loan_data->borroweeId,
+						       	loan_data->itemName,
+						       	loan_data->items_borrowed);
 				}
 				curr_loan = curr_loan->next;
 			}
@@ -714,7 +775,7 @@ BOOLEAN save_item_data(struct ets * ets, FILE * equipFp)
 	while(node)
 	{      
 		/* Print node -> data to file */
-		fprintf(equipFp, "%s|%s|%u|\n", node->data->itemId,
+		fprintf(equipFp, "%s|%s|%u\n", node->data->itemId,
 		    node->data->itemName,node->data->available);
 		/* get next node */
 		node = node->next;
@@ -742,11 +803,15 @@ BOOLEAN combine_members_loans2(struct ets * ets)
 		while(curr_loan != NULL)
 		{
 			loan_data = curr_loan->data;
-			if(strcmp(member_data->memberId, loan_data->borrowerId) == 0)
+			if(strcmp(member_data->memberId,
+				loan_data->borrowerId) == 0)
 			{
-				strcpy(loan_data->firstName, member_data->firstName);
-				strcpy(loan_data->lastName, member_data->lastName);
-				strcpy(member_data->itemId, loan_data->borroweeId);
+				strcpy(loan_data->firstName,
+					member_data->firstName);
+				strcpy(loan_data->lastName,
+					member_data->lastName);
+				strcpy(member_data->itemId,
+					loan_data->borroweeId);
 			}
 			curr_loan = curr_loan->next;
 		}
@@ -755,7 +820,8 @@ BOOLEAN combine_members_loans2(struct ets * ets)
 	return TRUE;
 }
 
-void add_to_existing_loan(struct ets * ets, char *item_needle, char *member_needle, unsigned amount)
+void add_to_existing_loan(struct ets * ets, char *item_needle,
+	       	char *member_needle, unsigned amount)
 {
 	struct ets_node *curr_node;
 	struct ets_item *curr_data;
@@ -771,7 +837,8 @@ void add_to_existing_loan(struct ets * ets, char *item_needle, char *member_need
 	}
 }
 
-BOOLEAN delete_loan_node(struct ets_list *list, char *itemId, struct ets_item *removed_item)
+BOOLEAN delete_loan_node(struct ets_list *list, char *itemId,
+	       	struct ets_item *removed_item)
 {
 	struct ets_node *prev, *curr;
 	if(list == NULL || itemId == NULL)

@@ -23,7 +23,8 @@ int main(int argc, char * argv[])
 	BOOLEAN load_success;
 	if(argc != NUMARGS)
 	{
-		fprintf(stderr,"Fatal Error: Must have %d number of command line arguments\n",NUMARGS);
+		fprintf(stderr,"Fatal Error: Must have %d number of command line arguments\n",
+		NUMARGS);
 		printf("Enter in the format ./ets <equip_file> <member_file> <loan_file>\n");
 		return EXIT_FAILURE;
 	}
@@ -31,6 +32,7 @@ int main(int argc, char * argv[])
 	load_success = load_data(&ets, argv[1], argv[2], argv[3]);
 	if(load_success == FALSE)
 	{
+		/*If there was a problem with loading the file*/
 		printf("Make sure that you enter in the format ./ets <equip_file> <member_file> <loan_file>\n");
 		return EXIT_FAILURE;
 	}
@@ -42,14 +44,15 @@ int main(int argc, char * argv[])
 		printf("\n\n");
 		menu_print(menu_items);
 		selection = get_valid_selection(menu_items);
-		if((selection == 13 || selection == 8) && menu_items[selection - 1].func(&ets) == TRUE)
+		/*If either the abort option or save & exit option is selected*/
+		if((selection == 13 || selection == 8)
+		&& menu_items[selection - 1].func(&ets) == TRUE)
 		{
 			exit = TRUE;
 			break;
 		}
 		if(selection != 13 && selection != 8)
 			menu_items[selection - 1].func(&ets);
-		/*combine_items_loans(&ets);*/
 		combine_members_loans2(&ets);
 	}
 	while(exit == FALSE);

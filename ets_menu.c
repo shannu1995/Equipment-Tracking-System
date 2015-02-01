@@ -14,18 +14,23 @@
 void menu_init(struct menu_item  menu[])
 {
 	int i;
+	/*The array of strings*/
 	char *options[] =
-	{"Loan Equipment", "Return Equipment", "Query Equipment ID", "Query Member ID",
-	"Display Equipment List", "Display Loan List","Display Member List", "Save and Exit", "Add New Equipment", "Change Equipment Amount",
+	{"Loan Equipment", "Return Equipment", "Query Equipment ID",
+	"Query Member ID","Display Equipment List", "Display Loan List",
+	"Display Member List", "Save and Exit",
+	"Add New Equipment", "Change Equipment Amount",
 	"Add Member", "Delete Member",
 	"Abort"};
-	
+	/*The array of menu structs*/
 	BOOLEAN (*options_funcs[])(struct ets*) =
 	{
-		loan_equipment, return_equipment, query_equipment_id, query_member_id, display_equipment, display_loan_list,
-		display_member_list, save, add_equipment, change_equipment_amount, add_member, delete_member, abort_program
+		loan_equipment, return_equipment, query_equipment_id,
+		query_member_id,display_equipment, display_loan_list,
+		display_member_list, save, add_equipment,
+		change_equipment_amount,add_member, delete_member, abort_program
 	};
-	
+	/*Combination of the aforementioned arrays*/
 	for(i = 0; i < NUM_MENU_ITEMS; i++)
 	{
 		strcpy(menu[i].name, options[i]);
@@ -34,6 +39,7 @@ void menu_init(struct menu_item  menu[])
 	
 }
 
+/*Prints the menu*/
 void menu_print(struct menu_item  menu[])
 {
 	int i;
@@ -54,6 +60,7 @@ void menu_print(struct menu_item  menu[])
 	printf("\n");
 }
 
+/*Carries out the user input and validates it*/
 int get_valid_selection(struct menu_item menu[])
 {
 	int selection;
